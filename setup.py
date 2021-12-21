@@ -41,7 +41,7 @@ setuptools.setup(
         'scikit-image',
         'scikit-build',
         'scipy',
-        'Pillow',
+        'Pillow==8.4.0',
         'humanize'
     ],
     setup_requires=['wheel'],
