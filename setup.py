@@ -26,7 +26,7 @@ setuptools.setup(
     install_requires=[
         'click',
         'psutil',
-	'numpy==1.21.5',
+	'numpy==1.22.0',
         'numba==0.55.1',
         'pandas==1.4.1',
         'networkx',
