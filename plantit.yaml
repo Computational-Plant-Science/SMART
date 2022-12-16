@@ -6,14 +6,23 @@ image: docker://computationalplantscience/smart
 commands: python3 /opt/smart/core/trait_extract_parallel_demo.py -p $INPUT -n $NUM_CLUSTERS -min $MIN_SIZE -md $MIN_DIST
 params:
   - name: num_clusters
-    type: int
+    type: number
     default: 2
+    step: 1
+    min: 1
+    max: 20
   - name: min_size
-    type: int
+    type: number
     default: 200
+    step: 1
+    min: 1
+    max: 10000
   - name: min_dist
-    type: int
+    type: number
     default: 25
+    step: 1
+    min: 1
+    max: 1000
 input:
   kind: files
   filetypes:
