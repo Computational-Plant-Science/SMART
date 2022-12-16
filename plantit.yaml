@@ -16,7 +16,6 @@ params:
     default: 25
 input:
   kind: files
-  path:
   filetypes:
     - jpg
     - png
