@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.black]
+line-length = 79
+target-version = ['py37', 'py38', 'py39']
+
+[tool.isort]
+profile = "black"
+src_paths = ["smart_arabidopsis_traits"]
+line_length = 79
+
+[tool.setuptools_scm]
+fallback_version = "999"
+
+[tool.pytest.ini_options]
+addopts = ["--import-mode=importlib"]

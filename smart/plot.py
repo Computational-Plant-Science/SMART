@@ -1,31 +1,14 @@
-"""
-Version: 1.0
-Summary: color clustering alogrithm, designed for analysis color distributation in plant image
-Author: suxing liu
-Author-email: suxingliu@gmail.com
-
-USAGE
-
-import utils
-# using as a library
-
-"""
-#!/usr/bin/python
-
-
-# import the necessary packages
-import numpy as np
 import cv2
-from scipy import ndimage
-import pylab as P
-from matplotlib import pyplot as plt
 import matplotlib.colors as colors
+import numpy as np
+from matplotlib import pyplot as plt
 from matplotlib.ticker import FormatStrFormatter
 
 
 # Function of rgb to hex color space
 def rgb_to_hex(rgb_tuple):
     return colors.rgb2hex([1.0*x/255 for x in rgb_tuple])
+
 
 # Function for generating the histogram using centered labels
 def centroid_histogram(clt):
@@ -40,7 +23,8 @@ def centroid_histogram(clt):
 
     # return the histogram
     return hist
-    
+
+
 # Function for plotting the histogram using centered labels    
 def plot_centroid_histogram(path, clt):
     # grab the number of different clusters and create a histogram
@@ -137,7 +121,8 @@ def plot_centroid_histogram(path, clt):
     #plt.show()
             
     return numLabels
-    
+
+
 # Function for plotting the color distributation as a bar figure 
 def plot_colors(hist, centroids):
     # initialize the bar chart representing the relative frequency
@@ -157,8 +142,9 @@ def plot_colors(hist, centroids):
     # return the bar chart
     return bar
 
+
 # Function for plotting the histogram using centered labels    
-def plot_labeled_histogram(pixels,bins_num):
+def plot_labeled_histogram(pixels,bins_num,clt):
     # grab the number of different clusters and create a histogram
     # based on the number of pixels assigned to each cluster
     numLabels = bins_num
@@ -174,8 +160,8 @@ def plot_labeled_histogram(pixels,bins_num):
     ax.set_xticks(bins)
     # Set the xaxis's tick labels to be formatted with 1 decimal place...
     ax.xaxis.set_major_formatter(FormatStrFormatter('%0.1f'))
-    
-    
+
+
     color_lable = clt.cluster_centers_
 
     # Setting each cluster's value
@@ -226,5 +212,3 @@ def plot_color_bar(path, bar):
     complete_path = path + 'color_bar.png'       
     plt.savefig(complete_path)
     plt.close(fig)
-
-    

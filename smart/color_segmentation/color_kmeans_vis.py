@@ -21,15 +21,10 @@ python3 color_kmeans_vis.py -p /home/suxingliu/plant-image-analysis/sample_test/
 #!/usr/bin/python
 
 # import the necessary packages
-from sklearn.cluster import KMeans
 from sklearn.cluster import MiniBatchKMeans
-import matplotlib.pyplot as plt
 import argparse
-import utils
+from scripts import utils
 import cv2
-import numpy as np
-import matplotlib.image as mpimg
-import pylab as P
 import os
 
 def mkdir(path):
@@ -112,7 +107,7 @@ def color_quantization(image, mask):
         clt.cluster_centers_ = clt.cluster_centers_[1: len(clt.cluster_centers_)]
 
     #build a histogram of clusters using center lables
-    numLabels = utils.plot_centroid_histogram(save_path,clt)
+    numLabels = utils.plot_centroid_histogram(save_path, clt)
 
     #create a figure representing the distribution of each color
     bar = utils.plot_colors(hist, clt.cluster_centers_)

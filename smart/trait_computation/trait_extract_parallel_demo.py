@@ -13,30 +13,24 @@ Created: 2018-09-29
 
 USAGE:
 
-time python3 trait_extract_parallel_mi.py -p ~/example/plant_test/mi_test/ -ft png -min 100 -md 5  -tp ~/example/plant_test/mi_test/marker_template/marker_template.png
+time python3 trait_extract_parallel_demo.py -p ~/example/plant_test/mi_test/ -ft png 
+
 
 '''
 
 # import the necessary packages
 import os
 import glob
-import utils
 
 from collections import Counter
 
-import argparse
-
 from sklearn.cluster import KMeans
-from sklearn.cluster import MiniBatchKMeans
 
 from skimage.feature import peak_local_max
 from skimage.morphology import medial_axis
-from skimage import img_as_float, img_as_ubyte, img_as_bool, img_as_int
-from skimage import measure
-from skimage.color import rgb2lab, deltaE_cie76
+from skimage import img_as_float, img_as_ubyte, img_as_bool
 from skimage import morphology
 from skimage.segmentation import clear_border, watershed
-from skimage.measure import regionprops
 
 from scipy.spatial import distance as dist
 from scipy import optimize
@@ -54,26 +48,21 @@ import argparse
 import cv2
 
 import matplotlib.pyplot as plt
-import matplotlib.patches as mpatches
 
 import math
 import openpyxl
-import csv
-    
-from tabulate import tabulate
 
 import warnings
 warnings.filterwarnings("ignore")
 
+'''
 import psutil
 import concurrent.futures
 import multiprocessing
 from multiprocessing import Pool
 from contextlib import closing
-
-from pathlib import Path 
-
-from matplotlib import collections
+'''
+from pathlib import Path
 
 import matplotlib.colors
 
@@ -1507,21 +1496,21 @@ def extract_traits(image_file):
         save_path = args['result']
     else:
          # save folder construction
-        mkpath = os.path.dirname(abs_path) +'/marker_detection'
-        mkdir(mkpath)
-        marker_save_path = mkpath + '/'
+        #mkpath = os.path.dirname(abs_path) +'/marker_detection'
+        #mkdir(mkpath)
+        #marker_save_path = mkpath + '/'
         
         mkpath = os.path.dirname(abs_path) +'/' + base_name
         mkdir(mkpath)
         save_path = mkpath + '/'
         
-        track_save_path = os.path.dirname(abs_path) + '/trace/'
-        mkdir(track_save_path)
+        #track_save_path = os.path.dirname(abs_path) + '/trace/'
+        #mkdir(track_save_path)
         
        
     print("results_folder: {0}\n".format(str(save_path)))
     
-    print("track_save_path:  {0}\n".format(str(track_save_path)))
+    #print("track_save_path:  {0}\n".format(str(track_save_path)))
     
    
     
@@ -1676,8 +1665,8 @@ def extract_traits(image_file):
         cv2.imwrite(result_file, label_trait)
         
         #save watershed result label image
-        result_file = (track_save_path + base_name + '_trace' + file_extension)
-        cv2.imwrite(result_file, track_trait)
+        #result_file = (track_save_path + base_name + '_trace' + file_extension)
+        #cv2.imwrite(result_file, track_trait)
         
         
 
@@ -1705,15 +1694,15 @@ if __name__ == '__main__':
     
     ap = argparse.ArgumentParser()
     ap.add_argument("-p", "--path", required = True,    help="path to image file")
-    ap.add_argument("-ft", "--filetype", required=True,    help="Image filetype")
+    ap.add_argument("-ft", "--filetype", required = False,  default = 'jpg',  help="Image filetype")
     ap.add_argument("-r", "--result", required = False,    help="result path")
     ap.add_argument('-s', '--color-space', type = str, required = False, default ='lab', help='Color space to use: BGR (default), HSV, Lab, YCrCb (YCC)')
     ap.add_argument('-c', '--channels', type = str, required = False, default='1', help='Channel indices to use for clustering, where 0 is the first channel,' 
                                                                        + ' 1 is the second channel, etc. E.g., if BGR color space is used, "02" ' 
                                                                        + 'selects channels B and R. (default "all")')
     ap.add_argument('-n', '--num-clusters', type = int, required = False, default = 2,  help = 'Number of clusters for K-means clustering (default 2, min 2).')
-    ap.add_argument('-min', '--min_size', type = int, required = False, default = 100,  help = 'min size of object to be segmented.')
-    ap.add_argument('-md', '--min_dist', type = int, required = False, default = 10,  help = 'distance threshold of watershed segmentation.')
+    ap.add_argument('-min', '--min_size', type = int, required = False, default = 200,  help = 'min size of object to be segmented.')
+    ap.add_argument('-md', '--min_dist', type = int, required = False, default = 25,  help = 'distance threshold of watershed segmentation.')
     ap.add_argument("-tp", "--temp_path", required = False,  help="template image path")
     args = vars(ap.parse_args())
     
@@ -1732,6 +1721,7 @@ if __name__ == '__main__':
     #accquire image file list
     imgList = sorted(glob.glob(image_file_path))
     
+    '''
     global  template
     template_path = args['temp_path']
     
@@ -1745,7 +1735,7 @@ if __name__ == '__main__':
             print("template image loaded!\n")
     else:
         print("template path empty\n")
-        
+    '''
 
     #print((imgList))
     #global save_path
@@ -1842,17 +1832,19 @@ if __name__ == '__main__':
     
     if os.path.isfile(trait_file):
         # update values
+        # update values
         #Open an xlsx for reading
         wb = openpyxl.load_workbook(trait_file)
 
         #Get the current Active Sheet
-        sheet = wb.active
-        
-        sheet.delete_rows(2, sheet.max_row+1) # for entire sheet
-        
-        sheet_leaf = wb.create_sheet()
-        
-        #sheet_leaf.delete_rows(2, sheet_leaf.max_row+1) # for entire sheet
+        sheet = wb['plant morphological traits']
+
+        sheet.delete_rows(2, sheet_pixel.max_row - 1) # for entire sheet
+
+        #Get the current Active Sheet
+        sheet_cm = wb['leaf specific traits']
+
+        sheet_cm.delete_rows(2, sheet_cm.max_row - 1) # for entire sheet
         
         
 
@@ -1860,8 +1852,10 @@ if __name__ == '__main__':
         # Keep presets
         wb = openpyxl.Workbook()
         sheet = wb.active
+        sheet.title = "plant morphological traits"
         
         sheet_leaf = wb.create_sheet()
+        sheet_leaf.title = "leaf specific traits"
 
         sheet.cell(row = 1, column = 1).value = 'filename'
         sheet.cell(row = 1, column = 2).value = 'leaf_area'

@@ -13,39 +13,32 @@ Created: 2018-09-29
 
 USAGE:
 
-time python3 trait_extract_parallel.py -p ~/example/test/ -ft jpg 
+time python3 trait_extract_parallel_mi.py -p ~/example/plant_test/mi_test/ -ft png -min 100 -md 5  -tp ~/example/plant_test/mi_test/marker_template/marker_template.png
 
 '''
 
 # import the necessary packages
 import os
 import glob
-import utils
 
 from collections import Counter
 
-import argparse
-
 from sklearn.cluster import KMeans
-from sklearn.cluster import MiniBatchKMeans
 
 from skimage.feature import peak_local_max
 from skimage.morphology import medial_axis
-from skimage import img_as_float, img_as_ubyte, img_as_bool, img_as_int
-from skimage import measure
-from skimage.color import rgb2lab, deltaE_cie76
+from skimage import img_as_float, img_as_ubyte, img_as_bool
 from skimage import morphology
 from skimage.segmentation import clear_border, watershed
-from skimage.measure import regionprops
 
 from scipy.spatial import distance as dist
 from scipy import optimize
 from scipy import ndimage
 from scipy.interpolate import interp1d
 
-from skan import skeleton_to_csgraph, Skeleton, summarize, draw
+#from skan import skeleton_to_csgraph, Skeleton, summarize, draw
 
-import networkx as nx
+#import networkx as nx
 
 import imutils
 
@@ -54,27 +47,16 @@ import argparse
 import cv2
 
 import matplotlib.pyplot as plt
-import matplotlib.patches as mpatches
 
 import math
 import openpyxl
-import csv
-    
-from tabulate import tabulate
 
 import warnings
 warnings.filterwarnings("ignore")
 
-import psutil
-import concurrent.futures
-import multiprocessing
-from multiprocessing import Pool
-from contextlib import closing
+from pathlib import Path
 
-from pathlib import Path 
-
-from matplotlib import collections
-
+import matplotlib.colors
 
 
 MBFACTOR = float(1<<20)
@@ -214,7 +196,7 @@ def color_cluster_seg(image, args_colorspace, args_channels, args_num_clusters):
     
     ret, thresh = cv2.threshold(kmeansImage,0,255,cv2.THRESH_BINARY | cv2.THRESH_OTSU)
     
-    #thresh_cleaned = clear_border(thresh)
+    #thresh_cleaned = (thresh)
     
     
     if np.count_nonzero(thresh) > 0:
@@ -222,7 +204,8 @@ def color_cluster_seg(image, args_colorspace, args_channels, args_num_clusters):
         thresh_cleaned = clear_border(thresh)
     else:
         thresh_cleaned = thresh
-        
+    
+     
     nb_components, output, stats, centroids = cv2.connectedComponentsWithStats(thresh_cleaned, connectivity = 8)
 
     # stats[0], centroids[0] are for the background label. ignore
@@ -245,7 +228,7 @@ def color_cluster_seg(image, args_colorspace, args_channels, args_num_clusters):
     
     nb_components = nb_components - 1
     
-    min_size = 100*2
+    
     
     max_size = width*height*0.1
     
@@ -280,6 +263,8 @@ def color_cluster_seg(image, args_colorspace, args_channels, args_num_clusters):
     #print(img_thresh.dtype)
     
     
+    size_kernel = 5
+    
     #if mask contains mutiple non-conected parts, combine them into one. 
     contours, hier = cv2.findContours(img_thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     
@@ -287,7 +272,7 @@ def color_cluster_seg(image, args_colorspace, args_channels, args_num_clusters):
         
         print("mask contains mutiple non-conected parts, combine them into one\n")
         
-        kernel = np.ones((4,4), np.uint8)
+        kernel = np.ones((size_kernel,size_kernel), np.uint8)
 
         dilation = cv2.dilate(img_thresh.copy(), kernel, iterations = 1)
         
@@ -365,6 +350,223 @@ def percentage(part, whole):
   
   return str(percentage)
 
+
+
+
+def circle_detection(image):
+
+    """Detecting Circles in Images using OpenCV and Hough Circles
+    
+    Inputs: 
+    
+        image: image loaded 
+
+    Returns:
+    
+        circles: detcted circles
+        
+        circle_detection_img: circle overlayed with image
+        
+        diameter_circle: diameter of detected circle
+        
+    """
+    
+    # create background image for drawing the detected circle
+    output = image.copy()
+    
+    # obtain image dimension
+    img_height, img_width, n_channels = image.shape
+    
+    #backup input image
+    circle_detection_img = image.copy()
+    
+    # change image from RGB to Gray scale
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    
+    # apply blur filter 
+    blurred = cv2.medianBlur(gray, 25)
+    
+    # setup parameters for circle detection
+    
+    # This parameter is the inverse ratio of the accumulator resolution to the image resolution 
+    #(see Yuen et al. for more details). Essentially, the larger the dp gets, the smaller the accumulator array gets.
+    dp = 1.5
+    
+    #Minimum distance between the center (x, y) coordinates of detected circles. 
+    #If the minDist is too small, multiple circles in the same neighborhood as the original may be (falsely) detected. 
+    #If the minDist is too large, then some circles may not be detected at all.
+    minDist = 100
+    
+    #Gradient value used to handle edge detection in the Yuen et al. method.
+    #param1 = 30
+    
+    #accumulator threshold value for the cv2.HOUGH_GRADIENT method. 
+    #The smaller the threshold is, the more circles will be detected (including false circles). 
+    #The larger the threshold is, the more circles will potentially be returned. 
+    #param2 = 30  
+    
+    #Minimum/Maximum size of the radius (in pixels).
+    #minRadius = 80
+    #maxRadius = 120 
+    
+    # detect circles in the image
+    #circles = cv2.HoughCircles(blurred, cv2.HOUGH_GRADIENT, 1.2, minDist, param1=param1, param2=param2, minRadius=minRadius, maxRadius=maxRadius)
+    
+    # detect circles in the image
+    circles = cv2.HoughCircles(blurred, cv2.HOUGH_GRADIENT, dp, minDist)
+    
+    # initialize diameter of detected circle
+    diameter_circle = 0
+    
+    
+    circle_center_coord = []
+    circle_center_radius = []
+    idx_closest = 0
+    
+    
+    # convert the (x, y) coordinates and radius of the circles to integers
+    circles = np.round(circles[0, :]).astype("int")
+    
+    if len(circles) > 1:
+        
+        print("More than one circles were found!")
+        
+        idx_closest = 0
+    
+    else:
+
+        # ensure at least some circles were found
+        if circles is not None and len(circles) > 0:
+            
+            idx_closest = 0
+    
+    # loop over the (x, y) coordinates and radius of the circles
+    for (x, y, r) in circles:
+        
+        coord = (x, y)
+        
+        circle_center_coord.append(coord)
+        circle_center_radius.append(r)
+
+    if idx_closest == 0:
+    
+        print("Circle marker with radius = {} was detected!\n".format(circle_center_radius[idx_closest]))
+    '''
+    # draw the circle in the output image, then draw a center
+    circle_detection_img = cv2.circle(output, circle_center_coord[idx_closest], circle_center_radius[idx_closest], (0, 255, 0), 4)
+    circle_detection_img = cv2.circle(output, circle_center_coord[idx_closest], 5, (0, 128, 255), -1)
+
+    # compute the diameter of coin
+    diameter_circle = circle_center_radius[idx_closest]*2
+    
+    
+    tmp_mask = np.zeros([img_width, img_height], dtype=np.uint8)
+    
+    tmp_mask = cv2.circle(tmp_mask, circle_center_coord[idx_closest], circle_center_radius[idx_closest] + 5, (255, 255, 255), -1)
+    
+    tmp_mask_binary = cv2.threshold(tmp_mask, 128, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
+    
+    masked_tmp = cv2.bitwise_and(image.copy(), image.copy(), mask = ~tmp_mask_binary)
+    '''
+    
+    (startX, startY) = circle_center_coord[idx_closest]
+    
+    endX = startX + int(r*1.2) + 1050
+    endY = startY + int(r*1.2) + 1050
+    
+    sticker_crop_img = output[startY:endY, startX:endX]
+    
+    
+    return circles, sticker_crop_img, diameter_circle
+
+
+
+# Detect stickers in the image
+def sticker_detect(img_ori):
+    
+    '''
+    image_file_name = Path(image_file).name
+    
+    abs_path = os.path.abspath(image_file)
+    
+    filename, file_extension = os.path.splitext(abs_path)
+    base_name = os.path.splitext(os.path.basename(filename))[0]
+    
+    print("Processing image : {0}\n".format(str(image_file)))
+     
+    # save folder construction
+    mkpath = os.path.dirname(abs_path) +'/cropped'
+    mkdir(mkpath)
+    save_path = mkpath + '/'
+    print ("results_folder: " + save_path)
+    '''
+   
+
+    # load the image, clone it for output, and then convert it to grayscale
+    img_rgb = img_ori.copy()
+    
+    # Convert it to grayscale 
+    img_gray = cv2.cvtColor(img_rgb, cv2.COLOR_BGR2GRAY) 
+      
+    # Store width and height of template in w and h 
+    w, h = template.shape[::-1] 
+      
+    # Perform match operations. 
+    res = cv2.matchTemplate(img_gray, template, cv2.TM_CCOEFF_NORMED)
+    
+    #(minVal, maxVal, minLoc, maxLoc) = cv2.minMaxLoc(res)
+    
+    
+    # Specify a threshold 
+    threshold = 0.6
+    
+    if np.amax(res) > threshold:
+        
+        flag = True
+    else:
+
+        flag = False
+    
+    print(flag)
+    
+
+    # Store the coordinates of matched area in a numpy array 
+    loc = np.where( res >= threshold)  
+    
+    if len(loc):
+    
+        (y,x) = np.unravel_index(res.argmax(), res.shape)
+    
+        (min_val, max_val, min_loc, max_loc) = cv2.minMaxLoc(res)
+    
+        #print(y,x)
+        
+        #print(min_val, max_val, min_loc, max_loc)
+        
+        
+        (startX, startY) = max_loc
+        endX = startX + template.shape[0] + 1050 + 110
+        endY = startY + template.shape[1] + 1050 + 110
+        
+        '''
+        (startX, startY) = max_loc
+        startX = startX - 100
+        startY = startY
+        
+        endX = startX + template.shape[1] + int(w*0.8)
+        endY = startY + template.shape[0] + int(h*0.8)
+        '''
+        
+        # Draw a rectangle around the matched region. 
+        for pt in zip(*loc[::-1]): 
+            
+            sticker_overlay = cv2.rectangle(img_rgb, pt, (pt[0] + w, pt[1] + h), (0,255,255), 2)
+        
+        
+        sticker_crop_img = img_rgb[startY:endY, startX:endX]
+
+
+    return  sticker_crop_img, sticker_overlay
 
 '''
 def individual_object_seg(orig, labels, save_path, base_name, file_extension):
@@ -477,6 +679,14 @@ def comp_external_contour(orig,thresh):
     img_height, img_width, img_channels = orig.shape
    
     index = 1
+    
+    trait_img = orig.copy()
+    
+    area = 0
+    
+    solidity = 0
+    
+    w=h=0
     
     for c in contours:
         
@@ -663,7 +873,6 @@ def leaf_traits_computation(orig, labels, save_path, base_name, file_extension):
         contours, hierarchy = cv2.findContours(mask.copy(),cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
         c = max(contours, key = cv2.contourArea)
         
-        
        
         if len(c) >= 10 :
 
@@ -687,8 +896,8 @@ def leaf_traits_computation(orig, labels, save_path, base_name, file_extension):
     tracking_backgd = np.zeros(gray.shape, dtype = "uint8")
     #backgd.fill(128)
     
-    #backgd = orig
-    
+    label_trait = orig
+    track_trait = orig
     #clean area record list
     area_rec = []
     #individual leaf traits sorting based on area order 
@@ -818,6 +1027,12 @@ def leaf_traits_computation(orig, labels, save_path, base_name, file_extension):
 
 def RGB2HEX(color):
     return "#{:02x}{:02x}{:02x}".format(int(color[0]), int(color[1]), int(color[2]))
+    
+
+def RGB2FLOAT(color):
+    return "{:.2f}{:.2f}{:.2f}".format(int(color[0]/255.0), int(color[1]/255.0), int(color[2]/255.0))
+
+
 
 '''
 def color_quantization(image, mask, save_path, num_clusters):
@@ -1082,7 +1297,7 @@ def color_region(image, mask, save_path, num_clusters):
     # We get ordered colors by iterating through the keys
     ordered_colors = [center_colors[i] for i in counts.keys()]
     hex_colors = [RGB2HEX(ordered_colors[i]) for i in counts.keys()]
-    rgb_colors = [ordered_colors[i] for i in counts.keys()]
+    rgb_colors = [RGB2FLOAT(ordered_colors[i]) for i in counts.keys()]
 
     #print(hex_colors)
     
@@ -1227,7 +1442,25 @@ def isbright(image_file):
     
     print("np.mean(L) < thresh = {}".format(np.mean(L)))
     
-    return np.mean(L) < thresh
+    #return np.mean(L) < thresh
+    
+    return 1.0 < thresh
+
+
+
+
+def remove_character_string(str_input):
+    
+    return str_input.replace('#', '')
+
+
+def hex_mean_color(color1, color2, color3, color4):
+    
+    average_value = (int(remove_character_string(color1), 16) + int(remove_character_string(color2), 16) + int(remove_character_string(color3), 16) + int(remove_character_string(color4), 16))//4
+       
+    return hex(average_value)
+
+
 
 
 def extract_traits(image_file):
@@ -1254,25 +1487,32 @@ def extract_traits(image_file):
     if (args['result']):
         save_path = args['result']
     else:
+         # save folder construction
+        mkpath = os.path.dirname(abs_path) +'/marker_detection'
+        mkdir(mkpath)
+        marker_save_path = mkpath + '/'
+        
         mkpath = os.path.dirname(abs_path) +'/' + base_name
         mkdir(mkpath)
         save_path = mkpath + '/'
         
         track_save_path = os.path.dirname(abs_path) + '/trace/'
         mkdir(track_save_path)
-
-    print ("results_folder: " + save_path)
+        
+       
+    print("results_folder: {0}\n".format(str(save_path)))
     
-    print ("track_save_path: " + track_save_path)
+    print("track_save_path:  {0}\n".format(str(track_save_path)))
     
+   
     
         
     if isbright(image_file):
     
         if (file_size > 5.0):
-            print("It will take some time due to larger file size {0} MB".format(str(int(file_size))))
+            print("File size is {0} MB\n".format(str(int(file_size))))
         else:
-            print("Segmentaing plant object using automatic color clustering method... ")
+            print("Plant object segmentation using automatic color clustering method... \n")
         
         image = cv2.imread(image_file)
         
@@ -1285,26 +1525,46 @@ def extract_traits(image_file):
         args_channels = args['channels']
         args_num_clusters = args['num_clusters']
         
+        '''
+        (sticker_crop_img, sticker_overlay) = sticker_detect(orig)
+        
+        # save segmentation result
+        result_file = (marker_save_path + base_name + '.' + args['filetype'])
+        #print(result_file)
+        cv2.imwrite(result_file, sticker_overlay)
+        '''
+        
+        (circles, sticker_crop_img, diameter_circle) = circle_detection(orig) 
+
+        # save result
+        result_file = (save_path + base_name + '_circle_template' + file_extension)
+        cv2.imwrite(result_file, sticker_crop_img)
+        
+        
+        orig = sticker_crop_img.copy()
+        
+        #orig = sticker_crop_img.copy()
+        
         #color clustering based plant object segmentation
         thresh = color_cluster_seg(orig, args_colorspace, args_channels, args_num_clusters)
         # save segmentation result
         result_file = (save_path + base_name + '_seg' + file_extension)
         #print(filename)
         cv2.imwrite(result_file, thresh)
-        
-        
-        #find external contour 
-        (trait_img, area, solidity, max_width, max_height) = comp_external_contour(image.copy(),thresh)
-        # save segmentation result
-        result_file = (save_path + base_name + '_excontour' + file_extension)
-        #print(filename)
-        cv2.imwrite(result_file, trait_img)   
-        
+
         
         num_clusters = 5
         #save color quantization result
         #rgb_colors = color_quantization(image, thresh, save_path, num_clusters)
         (rgb_colors, counts, hex_colors) = color_region(orig, thresh, save_path, num_clusters)
+        
+        
+         #find external contour 
+        (trait_img, area, solidity, max_width, max_height) = comp_external_contour(orig, thresh)
+        # save segmentation result
+        result_file = (save_path + base_name + '_excontour' + file_extension)
+        #print(filename)
+        cv2.imwrite(result_file, trait_img)   
         
 
         #print("hex_colors = {} {}\n".format(hex_colors, type(hex_colors)))
@@ -1333,29 +1593,13 @@ def extract_traits(image_file):
         
         
         
-        selected_color = rgb2lab(np.uint8(np.asarray([[rgb_colors[0]]])))
+        #selected_color = rgb2lab(np.uint8(np.asarray([[rgb_colors[0]]])))
         
         ####################################################
-        '''
-        print("Color difference are : ") 
-        
-        print(selected_color)
-        
-        color_diff = []
-        
-        for index, value in enumerate(rgb_colors): 
-            #print(index, value) 
-            curr_color = rgb2lab(np.uint8(np.asarray([[value]])))
-            diff = deltaE_cie76(selected_color, curr_color)
-            
-            color_diff.append(diff)
-            
-            print(index, value, diff) 
-        
-        '''
+
         
         ###############################################
-        '''
+        
         #accquire medial axis of segmentation mask
         #image_skeleton = medial_axis_image(thresh)
         
@@ -1364,70 +1608,11 @@ def extract_traits(image_file):
         # save _skeleton result
         result_file = (save_path + base_name + '_skeleton' + file_extension)
         cv2.imwrite(result_file, img_as_ubyte(image_skeleton))
-        
-        ###
-        # ['skeleton-id', 'node-id-src', 'node-id-dst', 'branch-distance', 
-        #'branch-type', 'mean-pixel-value', 'stdev-pixel-value', 
-        #'image-coord-src-0', 'image-coord-src-1', 'image-coord-dst-0', 'image-coord-dst-1', 
-        #'coord-src-0', 'coord-src-1', 'coord-dst-0', 'coord-dst-1', 'euclidean-distance']
-        ###
-        
-        #get brach data
-        branch_data = summarize(Skeleton(image_skeleton))
-        #print(branch_data)
-        
-        #select end branch
-        sub_branch = branch_data.loc[branch_data['branch-type'] == 1]
-        
-        sub_branch_branch_distance = sub_branch["branch-distance"].tolist()
-     
-        # remove outliers in branch distance 
-        outlier_list = outlier_doubleMAD(sub_branch_branch_distance, thresh = 3.5)
-        
-        indices = [i for i, x in enumerate(outlier_list) if x]
-        
-        sub_branch_cleaned = sub_branch.drop(sub_branch.index[indices])
 
-        #print(outlier_list)
-        #print(indices)
-        #print(sub_branch)
-        
-        print(sub_branch_cleaned)
-        
-
-        
-        branch_type_list = sub_branch_cleaned["branch-type"].tolist()
-        
-        #print(branch_type_list.count(1))
-        
-        print("[INFO] {} branch end points found\n".format(branch_type_list.count(1)))
-        
-        #img_hist = branch_data.hist(column = 'branch-distance', by = 'branch-type', bins = 100)
-        #result_file = (save_path + base_name + '_hist' + file_extension)
-        #plt.savefig(result_file, transparent = True, bbox_inches = 'tight', pad_inches = 0)
-        #plt.close()
-
-        
-        fig = plt.plot()
-        source_image = cv2.cvtColor(orig, cv2.COLOR_BGR2RGB)
-        #img_overlay = draw.overlay_euclidean_skeleton_2d(source_image, branch_data, skeleton_color_source = 'branch-distance', skeleton_colormap = 'hsv')
-        img_overlay = draw.overlay_euclidean_skeleton_2d(source_image, branch_data, skeleton_color_source = 'branch-type', skeleton_colormap = 'hsv')
-        result_file = (save_path + base_name + '_euclidean_graph_overlay' + file_extension)
-        plt.savefig(result_file, transparent = True, bbox_inches = 'tight', pad_inches = 0)
-        plt.close()
-        
-        '''
         
         ############################################## leaf number computation
-        
-        if area > 20000:
-            min_distance_value = 10
-        elif area > 10000:
-            min_distance_value = 7
-        elif area > 5000:
-            min_distance_value = 7
-        else:
-            min_distance_value = 5
+
+        #min_distance_value = 3
             
         print("min_distance_value = {}\n".format(min_distance_value))
         
@@ -1458,49 +1643,14 @@ def extract_traits(image_file):
         #plt.imsave(result_file, img_as_float(labels), cmap = "Spectral")
         cv2.imwrite(result_file, labeled_img)
         
-        (avg_curv, label_trait, track_trait, leaf_index_rec, contours_rec, area_rec, curv_rec, solidity_rec, major_axis_rec, minor_axis_rec, leaf_color_ratio_rec, leaf_color_value_rec, box_coord_rec) = leaf_traits_computation(orig, labels, save_path, base_name, file_extension)
+        (avg_curv, label_trait, track_trait, leaf_index_rec, contours_rec, area_rec, curv_rec, solidity_rec, major_axis_rec, minor_axis_rec, leaf_color_ratio_rec, leaf_color_value_rec, box_coord_rec) = leaf_traits_computation(sticker_crop_img.copy(), labels, save_path, base_name, file_extension)
         
-        
-        #########################################################validation purpose, can be removed 
-        #write out box coordinates for validation
-        #print("bbox coordinates :{0}".format((box_coord_rec)))
-        
-        wb = openpyxl.Workbook()
-        sheet = wb.active
-        
-        sheet_leaf = wb.create_sheet()
 
-        sheet.cell(row = 1, column = 1).value = 'c1x'
-        sheet.cell(row = 1, column = 2).value = 'c1y'
-        sheet.cell(row = 1, column = 3).value = 'c2x'
-        sheet.cell(row = 1, column = 4).value = 'c2y'
-        sheet.cell(row = 1, column = 5).value = 'c3x'
-        sheet.cell(row = 1, column = 6).value = 'c3y'
-        sheet.cell(row = 1, column = 7).value = 'c4x'
-        sheet.cell(row = 1, column = 8).value = 'c4y'
-        
-        for row in box_coord_rec:
-            sheet.append(row)
-       
-        #file name and path
-        bbox_file = (args["path"] + 'bbox.xlsx')
-        
-        wb.save(bbox_file)
-        
-        bbox_file_csv = (args["path"] + 'bbox.csv')
-        #convert xlsx to csv format
-        wb = openpyxl.load_workbook(bbox_file)
-        sh = wb.active # was .get_active_sheet()
-        with open(bbox_file_csv, 'w', newline = "") as f:
-            c = csv.writer(f)
-            for r in sh.rows: # generator; was sh.rows
-                c.writerow([cell.value for cell in r])
-            
         #################################################################end of validation file
         
         n_leaves = int(len((leaf_index_rec)))
         
-        #print('number of leaves{0}'.format(n_leaves))
+        print('number of leaves = {0}'.format(n_leaves))
         
         #save watershed result label image
         result_file = (save_path + base_name + '_leafspec' + file_extension)
@@ -1510,10 +1660,9 @@ def extract_traits(image_file):
         result_file = (track_save_path + base_name + '_trace' + file_extension)
         cv2.imwrite(result_file, track_trait)
         
+        
 
         
-        
-    
     else:
         
         area=solidity=max_width=max_height=avg_curv=n_leaves=0
@@ -1539,17 +1688,23 @@ if __name__ == '__main__':
     ap.add_argument("-p", "--path", required = True,    help="path to image file")
     ap.add_argument("-ft", "--filetype", required=True,    help="Image filetype")
     ap.add_argument("-r", "--result", required = False,    help="result path")
-    ap.add_argument('-s', '--color-space', type = str, default ='lab', help='Color space to use: BGR (default), HSV, Lab, YCrCb (YCC)')
-    ap.add_argument('-c', '--channels', type = str, default='1', help='Channel indices to use for clustering, where 0 is the first channel,' 
+    ap.add_argument('-s', '--color-space', type = str, required = False, default ='lab', help='Color space to use: BGR (default), HSV, Lab, YCrCb (YCC)')
+    ap.add_argument('-c', '--channels', type = str, required = False, default='1', help='Channel indices to use for clustering, where 0 is the first channel,' 
                                                                        + ' 1 is the second channel, etc. E.g., if BGR color space is used, "02" ' 
                                                                        + 'selects channels B and R. (default "all")')
-    ap.add_argument('-n', '--num-clusters', type = int, default = 2,  help = 'Number of clusters for K-means clustering (default 2, min 2).')
+    ap.add_argument('-n', '--num-clusters', type = int, required = False, default = 2,  help = 'Number of clusters for K-means clustering (default 2, min 2).')
+    ap.add_argument('-min', '--min_size', type = int, required = False, default = 100,  help = 'min size of object to be segmented.')
+    ap.add_argument('-md', '--min_dist', type = int, required = False, default = 10,  help = 'distance threshold of watershed segmentation.')
+    ap.add_argument("-tp", "--temp_path", required = False,  help="template image path")
     args = vars(ap.parse_args())
     
     
     # setting path to model file
     file_path = args["path"]
     ext = args['filetype']
+    
+    min_size = args['min_size']
+    min_distance_value = args['min_dist']
 
     #accquire image file list
     filetype = '*.' + ext
@@ -1557,6 +1712,21 @@ if __name__ == '__main__':
     
     #accquire image file list
     imgList = sorted(glob.glob(image_file_path))
+    
+    global  template
+    template_path = args['temp_path']
+    
+    if not template_path:
+        # Read the template 
+        template = cv2.imread(template_path, 0) 
+        
+        if template is None:
+            print("template image is empty!\n")
+        else:
+            print("template image loaded!\n")
+    else:
+        print("template path empty\n")
+        
 
     #print((imgList))
     #global save_path
@@ -1568,17 +1738,33 @@ if __name__ == '__main__':
     result_list_leaf = []
     
     #loop execute
-    for image in imgList:
+    for image_id, image in enumerate(imgList):
         
+        if image_id > 20:
+            
+            min_distance_value = 35
+        
+        elif image_id > 40:
+            
+            min_distance_value = 55
+
+            
         (filename, area, solidity, max_width, max_height, avg_curv, n_leaves, color_ratio, hex_colors, leaf_index_rec, area_rec, curv_rec, solidity_rec, major_axis_rec, minor_axis_rec, leaf_color_ratio_rec, leaf_color_value_rec) = extract_traits(image)
         
-        result_list.append([filename, area, solidity, max_width, max_height, avg_curv, n_leaves, color_ratio[0], color_ratio[0], color_ratio[0], color_ratio[0], hex_colors[0], hex_colors[1], hex_colors[2], hex_colors[3]])
+        #result_list.append([filename, area, solidity, max_width, max_height, avg_curv, n_leaves, color_ratio[0], color_ratio[1], color_ratio[2], color_ratio[3], hex_colors[0], hex_colors[1], hex_colors[2], hex_colors[3]])
         
-        #print(leaf_color_value_rec)
+        result_list.append([filename, area, solidity, max_width, max_height, avg_curv, n_leaves, color_ratio[0], color_ratio[1], color_ratio[2], color_ratio[3], 
+                            str(matplotlib.colors.to_rgb(hex_colors[0])), str(matplotlib.colors.to_rgb(hex_colors[1])), str(matplotlib.colors.to_rgb(hex_colors[2])), str(matplotlib.colors.to_rgb(hex_colors[3])),
+                            hex_colors[0], hex_colors[1], hex_colors[2], hex_colors[3], hex_mean_color(hex_colors[0], hex_colors[1], hex_colors[2], hex_colors[3])])
         
         for i in range(len(leaf_index_rec)):
             
-            result_list_leaf.append([filename, leaf_index_rec[i], area_rec[i], curv_rec[i], solidity_rec[i], major_axis_rec[i], minor_axis_rec[i], leaf_color_ratio_rec[i][0], leaf_color_ratio_rec[i][1], leaf_color_ratio_rec[i][2], leaf_color_ratio_rec[i][3], leaf_color_value_rec[i][0],leaf_color_value_rec[i][1],leaf_color_value_rec[i][2],leaf_color_value_rec[i][3]])
+            #result_list_leaf.append([filename, leaf_index_rec[i], area_rec[i], curv_rec[i], solidity_rec[i], major_axis_rec[i], minor_axis_rec[i], leaf_color_ratio_rec[i][0], leaf_color_ratio_rec[i][1], leaf_color_ratio_rec[i][2], leaf_color_ratio_rec[i][3], leaf_color_value_rec[i][0],leaf_color_value_rec[i][1],leaf_color_value_rec[i][2],leaf_color_value_rec[i][3]])
+            
+            result_list_leaf.append([filename, leaf_index_rec[i], area_rec[i], curv_rec[i], solidity_rec[i], major_axis_rec[i], minor_axis_rec[i], leaf_color_ratio_rec[i][0], leaf_color_ratio_rec[i][1], leaf_color_ratio_rec[i][2], leaf_color_ratio_rec[i][3], 
+                                    str(matplotlib.colors.to_rgb(leaf_color_value_rec[i][0])), str(matplotlib.colors.to_rgb(leaf_color_value_rec[i][1])), str(matplotlib.colors.to_rgb(leaf_color_value_rec[i][2])), str(matplotlib.colors.to_rgb(leaf_color_value_rec[i][3])),
+                                    str(leaf_color_value_rec[i][0]), str(leaf_color_value_rec[i][1]), str(leaf_color_value_rec[i][2]), str(leaf_color_value_rec[i][3]),
+                                    hex_mean_color(leaf_color_value_rec[i][0], leaf_color_value_rec[i][1], leaf_color_value_rec[i][2], leaf_color_value_rec[i][3])])
     '''
     
     #print(result_list)
@@ -1610,9 +1796,9 @@ if __name__ == '__main__':
     
     #output in command window in a sum table
  
-    table = tabulate(result_list, headers = ['filename', 'area', 'solidity', 'max_width', 'max_height' ,'avg_curv', 'n_leaves', 'cluster 1', 'cluster 2', 'cluster 3', 'cluster 4', 'cluster 1 hex value', 'cluster 2 hex value', 'cluster 3 hex value', 'cluster 4 hex value'], tablefmt = 'orgtbl')
+    #table = tabulate(result_list, headers = ['filename', 'area', 'solidity', 'max_width', 'max_height' ,'avg_curv', 'n_leaves', 'cluster 1', 'cluster 2', 'cluster 3', 'cluster 4', 'cluster 1 hex value', 'cluster 2 hex value', 'cluster 3 hex value', 'cluster 4 hex value'], tablefmt = 'orgtbl')
 
-    print(table + "\n")
+    #print(table + "\n")
     
     
     '''
@@ -1643,7 +1829,13 @@ if __name__ == '__main__':
         #Get the current Active Sheet
         sheet = wb.active
         
+        sheet.delete_rows(2, sheet.max_row+1) # for entire sheet
+        
         sheet_leaf = wb.create_sheet()
+        
+        #sheet_leaf.delete_rows(2, sheet_leaf.max_row+1) # for entire sheet
+        
+        
 
     else:
         # Keep presets
@@ -1663,10 +1855,15 @@ if __name__ == '__main__':
         sheet.cell(row = 1, column = 9).value = 'color distribution cluster 2'
         sheet.cell(row = 1, column = 10).value = 'color distribution cluster 3'
         sheet.cell(row = 1, column = 11).value = 'color distribution cluster 4'
-        sheet.cell(row = 1, column = 12).value = 'color cluster 1 hex value'
-        sheet.cell(row = 1, column = 13).value = 'color cluster 2 hex value'
-        sheet.cell(row = 1, column = 14).value = 'color cluster 3 hex value'
-        sheet.cell(row = 1, column = 15).value = 'color cluster 4 hex value'        
+        sheet.cell(row = 1, column = 12).value = 'color cluster 1 RGB value'
+        sheet.cell(row = 1, column = 13).value = 'color cluster 2 RGB value'
+        sheet.cell(row = 1, column = 14).value = 'color cluster 3 RGB value'
+        sheet.cell(row = 1, column = 15).value = 'color cluster 4 RGB value'
+        sheet.cell(row = 1, column = 16).value = 'color cluster 1 HEX value'
+        sheet.cell(row = 1, column = 17).value = 'color cluster 2 HEX value'
+        sheet.cell(row = 1, column = 18).value = 'color cluster 3 HEX value'
+        sheet.cell(row = 1, column = 19).value = 'color cluster 4 HEX value'
+        sheet.cell(row = 1, column = 20).value = 'average HEX value'       
         
     
         
@@ -1681,10 +1878,15 @@ if __name__ == '__main__':
         sheet_leaf.cell(row = 1, column = 9).value = 'color distribution cluster 2'
         sheet_leaf.cell(row = 1, column = 10).value = 'color distribution cluster 3'
         sheet_leaf.cell(row = 1, column = 11).value = 'color distribution cluster 4'
-        sheet_leaf.cell(row = 1, column = 12).value = 'color cluster 1 hex value'
-        sheet_leaf.cell(row = 1, column = 13).value = 'color cluster 2 hex value'
-        sheet_leaf.cell(row = 1, column = 14).value = 'color cluster 3 hex value'
-        sheet_leaf.cell(row = 1, column = 15).value = 'color cluster 4 hex value'
+        sheet_leaf.cell(row = 1, column = 12).value = 'color cluster 1 RGB value'
+        sheet_leaf.cell(row = 1, column = 13).value = 'color cluster 2 RGB value'
+        sheet_leaf.cell(row = 1, column = 14).value = 'color cluster 3 RGB value'
+        sheet_leaf.cell(row = 1, column = 15).value = 'color cluster 4 RGB value'
+        sheet_leaf.cell(row = 1, column = 16).value = 'color cluster 1 HEX value'
+        sheet_leaf.cell(row = 1, column = 17).value = 'color cluster 2 HEX value'
+        sheet_leaf.cell(row = 1, column = 18).value = 'color cluster 3 HEX value'
+        sheet_leaf.cell(row = 1, column = 19).value = 'color cluster 4 HEX value'
+        sheet_leaf.cell(row = 1, column = 20).value = 'average HEX value'      
         
         
         

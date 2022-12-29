@@ -2,7 +2,13 @@
 
 Author: Suxing Liu
 
-![CI](https://github.com/Computational-Plant-Science/arabidopsis-rosette-analysis/workflows/CI/badge.svg)
+
+![CI](https://github.com/Computational-Plant-Science/SMART/workflows/CI/badge.svg)
+[![GitHub tag](https://img.shields.io/github/tag/Computational-Plant-Science/SMART.svg)](https://github.com/Computational-Plant-Science/SMART/tags/latest)
+
+[![PyPI Version](https://img.shields.io/pypi/v/smart-arabidopsis-traits.png)](https://pypi.python.org/pypi/smart-arabidopsis-traits)
+[![PyPI Status](https://img.shields.io/pypi/status/smart-arabidopsis-traits.png)](https://pypi.python.org/pypi/smart-arabidopsis-traits)
+[![PyPI Versions](https://img.shields.io/pypi/pyversions/smart-arabidopsis-traits.png)](https://pypi.python.org/pypi/smart-arabidopsis-traits)
 
 ![Optional Text](../master/media/Smart.png) 
 
@@ -12,85 +18,114 @@ Robust and parameter-free plant image segmentation and trait extraction.
 2. Robust segmentation based on parameter-free color clustering method.
 3. Extract individual plant gemetrical traits, and write output into excel file.
 
-
-## Requirements
-
-Either [Docker](https://www.docker.com/) or [Singularity](https://sylabs.io/singularity/) is required to run this project in a Unix environment.
-
-Input images: Top view of individual plant tray images, default in *.jpg format. 
-
-## Usage
-
-### Docker
-
-```bash
-docker pull computationalplantscience/smart
-docker run -v "$(pwd)":/opt/arabidopsis-rosette-analysis -w /opt/arabidopsis-rosette-analysis computationalplantscience/arabidopsis-rosette-analysis python3 /opt/arabidopsis-rosette-analysis/trait_extract_parallel.py -i input -o output -ft "jpg,png"
-```
-
-### Singularity
-
-```bash
-singularity exec docker://computationalplantscience/arabidopsis-rosette-analysis python3 trait_extract_parallel.py -i input -o output -ft "jpg,png"
-```
-
 ![Optional Text](../master/media/image_01.png)
 
-![Optional Text](../master/media/Slide1.png)
+![Optional Text](../master/media/slides/Slide1.png)
 
-![Optional Text](../master/media/Slide2.png)
+![Optional Text](../master/media/slides/Slide2.png)
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Contents**
 
-- [Requirements](#requirements)
-- [Usage](#usage)
+- [Speedy Measurement of Arabidopsis Rosette Traits (SMART)](#speedy-measurement-of-arabidopsis-rosette-traits-smart)
+  - [Requirements](#requirements)
+  - [Installation](#installation)
+    - [Python](#python)
+    - [Docker](#docker)
+    - [Apptainer](#apptainer)
+  - [Quickstart](#quickstart)
+    - [Docker](#docker-1)
+    - [Apptainer](#apptainer-1)
+  - [Usage](#usage)
+    - [Input](#input)
+    - [Output](#output)
+    - [Filetypes](#filetypes)
+    - [Flags](#flags)
+  - [Input image guidelines](#input-image-guidelines)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## Requirements
 
-The easiest way to run this project is with [Docker](https://www.docker.com/) or [Singularity ](https://sylabs.io/singularity/).
+Python3.8+ is required to run SMART directly. Alternatively, a [Docker](https://www.docker.com/) [image definition](https://hub.docker.com/r/computationalplantscience/smart) is provided.
 
-To pull the `computationalplantscience/smart` image, the current working directory, and open a shell with Docker:
+## Installation
 
-`docker run -it -v $(pwd):/opt/dev -w /opt/dev computationalplantscience/smart bash`
+### Python
 
-Singularity users:
+SMART is available on the Python Package Index. To install it use:
 
-`singularity shell docker://computationalplantscience/smart`
+```shell
+pip install smart-arabidopsis-traits
+```
+
+### Docker
+
+```shell
+docker pull computationalplantscience/smart
+```
+
+### Apptainer
+
+```shell
+apptainer pull docker://computationalplantscience/smart
+```
+
+## Quickstart
+
+A few sample photos are baked into the Docker image definition. If you have installed SMART with `pip`, you will need to manually download the photos or clone this repository before running the example below.
+
+### Docker
+
+```bash
+
+docker run \
+  -w /opt/smart \
+  computationalplantscience/smart \
+  python3 trait_extract_parallel.py -i sample_test -o output -ft "jpg,png"
+```
+
+### Apptainer
+
+```bash
+apptainer exec \
+  -H /opt/smart \
+  docker://computationalplantscience/smart \
+  python3 trait_extract_parallel.py -i sample_test -o output -ft "jpg,png"
+```
 
 ## Usage
 
-sample test
+The `trait_extract_parallel.py` script is this repository's main entry point. It accepts the following options:
 
-Input: Individual plant top view images, in jpg or png format
+- `-i`: the input file or directory
+- `-o`: the output directory
+- `-ft`: input filetypes (optional)
+- `-l`: enable leaf analysis (optional)
+- `-m`: toggle multiple plant detection (optional)
 
-Output: Realted folders with same name of inout image files, which contains image results
+### Input
 
-and trait.xlsx and trait.csv for summary of traits computation results. 
+The input file or directory path. This parameter is required.
 
+### Output
 
+The path to the directory to write output files to. Output files include a number of PNG images, as well as traits extracted from the input images (written to `trait.csv` and `trait.xlsx`).
 
+If no output directory path is provided, results are written to the current working directory.
 
-Input image requirement:
+### Filetypes
 
-Plant top view image captured by HD resolution RGB camera, prefer black background with even illumination environment. 
+By default, JPG and PNG files are included. 
 
-Example input can be downled from "/sample_test/" folder, which contains top view images of a same Arabidopsis plant from different timepoints. 
-
-
-You can pass a folder path (`-p /path/to/dir`). By default any `JPG` and `PNG` are included. You can choose filetype explicitly with e.g. `-ft jpg`.
-
-To extract traits:
-
-`python3 /opt/smart/core/trait_extract_parallel_demo.py -p /path/to/input/file -r /path/to/output/folder`
-
-You can also use a folder path as above, likewise for filetype specification.
+### Flags
 
 By default this script will not perform leaf segmentation and analysis. To enable leaf analysis, use the `-l` flag.
 
-To indicate that your input is a multiple-tray or -individual photo, add the `-m` flag.
+To indicate that your input photo(s) contain(s) multiple plants or trays of plants, add the `-m` flag.
 
+## Input image guidelines
 
+Images should be captured top-down with an HD resolution RGB camera. Black background and even illumination are recommended for best results.
+
+High-quality sample input images are available in the `sample_test` folder. This folder contains images of an Arabidopsis rosette at different growth stages.
