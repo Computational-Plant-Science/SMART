@@ -112,15 +112,20 @@ E.g.
 
 Note: The "/" at the end of the path was NOT needed when mounting a host directory into a Docker container. Above command mount the local directory "/$path_to_test_image" inside the container path "/images"
 Reference: https://docs.docker.com/storage/bind-mounts/
-
+```
 
 For example, to run the sample test inside this repo, under the folder "sample_test", first locate the local path 
-
+```
     docker run -v /$path_to_SMART_repo/SMART/sample_test:/images -it computationalplantscience/smart
+```
 
+    then run the mounted input images inside the container:
+``` 
     python3 /opt/smart/core/trait_extract_parallel_demo.py -p /images/ -ft jpg
-
-
+```
+    or 
+```
+    docker run -v /$path_to_SMART_repo/SMART/sample_test:/images -it computationalplantscience/smart  python3 /opt/smart/core/trait_extract_parallel_demo.py -p /images/ -ft jpg
 ```
 
 2. Build your local container
@@ -137,4 +142,4 @@ Results will be generated in the same input folder, trait.xlsx and trait.csv con
 
 The other folde with the same name of inout images contains all related image results for visualization purpose. 
 
-They are processed copies of the original images.  
+They are processed copies of the original images, all the image content information was processed and extracted as traits inforamtion. 
