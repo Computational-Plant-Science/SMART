@@ -1583,6 +1583,9 @@ def extract_traits(image_file):
         
          #find external contour 
         (trait_img, area, solidity, max_width, max_height) = comp_external_contour(orig, thresh)
+        
+        
+        
         # save segmentation result
         result_file = (save_path + base_name + '_excontour' + file_extension)
         #print(filename)
@@ -1853,12 +1856,12 @@ if __name__ == '__main__':
         #Get the current Active Sheet
         sheet = wb['plant morphological traits']
 
-        sheet.delete_rows(2, sheet_pixel.max_row - 1) # for entire sheet
+        sheet.delete_rows(2, sheet.max_row - 1) # for entire sheet
 
         #Get the current Active Sheet
         sheet_cm = wb['leaf specific traits']
 
-        sheet_cm.delete_rows(2, sheet_cm.max_row - 1) # for entire sheet
+        sheet_cm.delete_rows(2, sheet_leaf.max_row - 1) # for entire sheet
         
         
 

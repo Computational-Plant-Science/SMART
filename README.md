@@ -15,24 +15,8 @@ Robust and parameter-free plant image segmentation and trait extraction.
 
 ## Requirements
 
-Either [Docker](https://www.docker.com/) or [Singularity](https://sylabs.io/singularity/) is required to run this project in a Unix environment.
-
 Input images: Top view of individual plant tray images, default in *.jpg format. 
 
-## Usage
-
-### Docker
-
-```bash
-docker pull computationalplantscience/smart
-docker run -v "$(pwd)":/opt/arabidopsis-rosette-analysis -w /opt/arabidopsis-rosette-analysis computationalplantscience/arabidopsis-rosette-analysis python3 /opt/arabidopsis-rosette-analysis/trait_extract_parallel.py -i input -o output -ft "jpg,png"
-```
-
-### Singularity
-
-```bash
-singularity exec docker://computationalplantscience/arabidopsis-rosette-analysis python3 trait_extract_parallel.py -i input -o output -ft "jpg,png"
-```
 
 ![Optional Text](../master/media/image_01.png)
 
@@ -49,19 +33,9 @@ singularity exec docker://computationalplantscience/arabidopsis-rosette-analysis
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-## Requirements
 
-The easiest way to run this project is with [Docker](https://www.docker.com/) or [Singularity ](https://sylabs.io/singularity/).
 
-To pull the `computationalplantscience/smart` image, the current working directory, and open a shell with Docker:
-
-`docker run -it -v $(pwd):/opt/dev -w /opt/dev computationalplantscience/smart bash`
-
-Singularity users:
-
-`singularity shell docker://computationalplantscience/smart`
-
-## Usage
+## Usage in local environment by cloning the whole GitHub repo 
 
 sample test
 
@@ -72,8 +46,6 @@ Output: Realted folders with same name of inout image files, which contains imag
 and trait.xlsx and trait.csv for summary of traits computation results. 
 
 
-
-
 Input image requirement:
 
 Plant top view image captured by HD resolution RGB camera, prefer black background with even illumination environment. 
@@ -81,16 +53,88 @@ Plant top view image captured by HD resolution RGB camera, prefer black backgrou
 Example input can be downled from "/sample_test/" folder, which contains top view images of a same Arabidopsis plant from different timepoints. 
 
 
-You can pass a folder path (`-p /path/to/dir`). By default any `JPG` and `PNG` are included. You can choose filetype explicitly with e.g. `-ft jpg`.
+1. Download the repo into local host PC:
 
-To extract traits:
+```bash
 
-`python3 /opt/smart/core/trait_extract_parallel_demo.py -p /path/to/input/file -r /path/to/output/folder`
+    git clone https://github.com/Computational-Plant-Science/SMART.git
 
-You can also use a folder path as above, likewise for filetype specification.
+```
 
-By default this script will not perform leaf segmentation and analysis. To enable leaf analysis, use the `-l` flag.
+   Now you should have a clone of the SMART pipeine source code in your local PC, the folder path was:
+```
+   /$host_path/SMART/
+   
+    Note: $host_path can be any path chosen by user. 
+```
 
-To indicate that your input is a multiple-tray or -individual photo, add the `-m` flag.
+2. Prepare your input image folder path,
+
+   here we use the sample images inside the repo as input, the path was:
+```
+   /$host_path/SMART/sample_test/
+```
+
+2. extract traits:
+
+```bash
+
+   cd /$host_path/SMART/
+
+   python3 /opt/smart/core/trait_extract_parallel_demo.py -p /$host_path/SMART/sample_test/ `
+
+```
+Results will be generated in the same input folder, however, user can specify the output folder by adding "-r /path/to/output/folder"
+
+Default input image type as jpg, can be changed by adding parameter such as " -ft png".
+
+E.g. 
+
+```bash
+
+   python3 /opt/smart/core/trait_extract_parallel_demo.py -p /$host_path/$inout_image_folder/ -ft png -r /$path_to_output_folder/`
+
+```
 
 
+## Usage for Docker contianer 
+
+
+[Docker](https://www.docker.com/) is suggested to run this project in a Unix environment.
+
+1. Download prebuilt docker container from DockerHub 
+
+```bash
+
+    docker pull computationalplantscience/smart
+
+    docker run -v /$path_to_test_image:/images -it computationalplantscience/smart
+
+Note: The "/" at the end of the path was NOT needed when mounting a host directory into a Docker container. Above command mount the local directory "/$path_to_test_image" inside the container path "/images"
+Reference: https://docs.docker.com/storage/bind-mounts/
+
+
+For example, to run the sample test inside this repo, under the folder "sample_test", first locate the local path 
+
+    docker run -v /$path_to_SMART_repo/SMART/sample_test:/images -it computationalplantscience/smart
+
+    python3 /opt/smart/core/trait_extract_parallel_demo.py -p /images/ -ft jpg
+
+
+```
+
+2. Build your local container
+
+```bash
+
+    docker build -t smart_container -f Dockerfile .
+
+    docker run -v  /home/suxing/SMART/sample_test:/images -it smart_container
+
+```
+
+Results will be generated in the same input folder, trait.xlsx and trait.csv contains traits computation results.
+
+The other folde with the same name of inout images contains all related image results for visualization purpose. 
+
+They are processed copies of the original images.  
