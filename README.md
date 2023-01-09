@@ -13,10 +13,7 @@ Robust and parameter-free plant image segmentation and trait extraction.
 3. Extract individual plant gemetrical traits, and write output into excel file.
 
 
-## Requirements
-
-Input images: Top view of individual plant tray images, default in *.jpg format. 
-
+## Sample work flow
 
 ![Optional Text](../master/media/image_01.png)
 
@@ -33,6 +30,18 @@ Input images: Top view of individual plant tray images, default in *.jpg format.
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
+
+
+
+## Inputs 
+
+   Individual plant tray image from top view, captured by ANY modern digital camera. 
+
+## Results 
+
+trait.xlsx, trait.csv
+
+Excel or csv file which contain traits computation values.
 
 
 ## Usage in local environment by cloning the whole GitHub repo 
