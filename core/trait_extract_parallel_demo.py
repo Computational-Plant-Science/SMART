@@ -498,8 +498,11 @@ def circle_detection(image):
 
         endX = startX + int(r*1.2) + 1050
         endY = startY + int(r*1.2) + 1050
-
-        sticker_crop_img = output[startY:endY, startX:endX]
+        
+        # for debug purpose, circle marker based segmentation
+        #sticker_crop_img = output[startY:endY, startX:endX]
+        
+        sticker_crop_img = output
     
     else:
         
@@ -508,6 +511,8 @@ def circle_detection(image):
         sticker_crop_img = output
         
         diameter_circle = 0
+    
+    
     
     
     return circles, sticker_crop_img, diameter_circle
