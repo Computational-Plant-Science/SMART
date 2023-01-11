@@ -446,57 +446,68 @@ def circle_detection(image):
     idx_closest = 0
     
     
-    # convert the (x, y) coordinates and radius of the circles to integers
-    circles = np.round(circles[0, :]).astype("int")
-    
-    if len(circles) > 1:
+    # At leaset one circle is found
+    if circles is not None:
         
-        print("More than one circles were found!")
+        # Get the (x, y, r) as integers, convert the (x, y) coordinates and radius of the circles to integers
+        circles = np.round(circles[0, :]).astype("int")
+       
+        if len(circles) < 2:
+           
+            print("Only one circle was found!\n")
+           
+        else:
+            
+            print("More than one circles were found!\n")
         
-        idx_closest = 0
+            idx_closest = 0
+        
+            cv2.circle(output, (x, y), r, (0, 255, 0), 2)
+          
+        # loop over the circles and the (x, y) coordinates to get radius of the circles
+        for (x, y, r) in circles:
+            
+            coord = (x, y)
+            
+            circle_center_coord.append(coord)
+            circle_center_radius.append(r)
+
+        if idx_closest == 0:
+
+            print("Circle marker with radius = {} was detected!\n".format(circle_center_radius[idx_closest]))
+        
+        '''
+        # draw the circle in the output image, then draw a center
+        circle_detection_img = cv2.circle(output, circle_center_coord[idx_closest], circle_center_radius[idx_closest], (0, 255, 0), 4)
+        circle_detection_img = cv2.circle(output, circle_center_coord[idx_closest], 5, (0, 128, 255), -1)
+
+        # compute the diameter of coin
+        diameter_circle = circle_center_radius[idx_closest]*2
+
+
+        tmp_mask = np.zeros([img_width, img_height], dtype=np.uint8)
+
+        tmp_mask = cv2.circle(tmp_mask, circle_center_coord[idx_closest], circle_center_radius[idx_closest] + 5, (255, 255, 255), -1)
+
+        tmp_mask_binary = cv2.threshold(tmp_mask, 128, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
+
+        masked_tmp = cv2.bitwise_and(image.copy(), image.copy(), mask = ~tmp_mask_binary)
+        '''
+
+        (startX, startY) = circle_center_coord[idx_closest]
+
+        endX = startX + int(r*1.2) + 1050
+        endY = startY + int(r*1.2) + 1050
+
+        sticker_crop_img = output[startY:endY, startX:endX]
     
     else:
-
-        # ensure at least some circles were found
-        if circles is not None and len(circles) > 0:
-            
-            idx_closest = 0
-    
-    # loop over the (x, y) coordinates and radius of the circles
-    for (x, y, r) in circles:
         
-        coord = (x, y)
+        print("No circle was found!\n")
         
-        circle_center_coord.append(coord)
-        circle_center_radius.append(r)
-
-    if idx_closest == 0:
-    
-        print("Circle marker with radius = {} was detected!\n".format(circle_center_radius[idx_closest]))
-    '''
-    # draw the circle in the output image, then draw a center
-    circle_detection_img = cv2.circle(output, circle_center_coord[idx_closest], circle_center_radius[idx_closest], (0, 255, 0), 4)
-    circle_detection_img = cv2.circle(output, circle_center_coord[idx_closest], 5, (0, 128, 255), -1)
-
-    # compute the diameter of coin
-    diameter_circle = circle_center_radius[idx_closest]*2
-    
-    
-    tmp_mask = np.zeros([img_width, img_height], dtype=np.uint8)
-    
-    tmp_mask = cv2.circle(tmp_mask, circle_center_coord[idx_closest], circle_center_radius[idx_closest] + 5, (255, 255, 255), -1)
-    
-    tmp_mask_binary = cv2.threshold(tmp_mask, 128, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
-    
-    masked_tmp = cv2.bitwise_and(image.copy(), image.copy(), mask = ~tmp_mask_binary)
-    '''
-    
-    (startX, startY) = circle_center_coord[idx_closest]
-    
-    endX = startX + int(r*1.2) + 1050
-    endY = startY + int(r*1.2) + 1050
-    
-    sticker_crop_img = output[startY:endY, startX:endX]
+        sticker_crop_img = output
+        
+        diameter_circle = 0
     
     
     return circles, sticker_crop_img, diameter_circle
