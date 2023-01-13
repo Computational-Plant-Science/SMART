@@ -152,3 +152,23 @@ Results will be generated in the same input folder, trait.xlsx and trait.csv con
 The other folde with the same name of inout images contains all related image results for visualization purpose. 
 
 They are processed copies of the original images, all the image content information was processed and extracted as traits inforamtion. 
+
+
+## collaboration
+
+
+SMART pipeline has been integreted into CyVerse cloud computing based webiste: PlantIT (https://plantit.cyverse.org/)
+
+CyVerse user can upload data and run the SMART pipeline for free. 
+
+
+SMART pipeline has been also applied in collabration with following research institutes and company: 
+
+1. Dr. David G. Mendoza-Cozatl at [University of Missouri](https://cafnr.missouri.edu/person/david-mendoza-cozatl/)
+
+2. Kranthi Varala at [Purdue University](https://www.purdue.edu/gradschool/pulse/groups/profiles/faculty/varala.html) 
+
+3. Filipe Matias at [Syngenta](https://www.linkedin.com/in/filipe-matias-27bab5199/)
+
+4. Briony Parker at [Rothamsted Research](https://repository.rothamsted.ac.uk/staff/98225/briony-parker)
+
