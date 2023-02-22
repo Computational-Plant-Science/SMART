@@ -176,8 +176,6 @@ SMART pipeline has been also applied in collabration with following research ins
 
 
 <br/><br/> 
-<br/><br/> 
-<br/><br/> 
 
 
 ## Imaging protocol for SMART
