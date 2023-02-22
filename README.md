@@ -205,6 +205,7 @@ Setting up camera
 
 
 Setting up the lighting environment
+
     1. Diffuse lighting is suggested. 
     2. Reduce shadow as much as possible.
     3. Keep the illumination environment constant between imaging different plants. 
