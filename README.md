@@ -154,7 +154,7 @@ The other folde with the same name of inout images contains all related image re
 They are processed copies of the original images, all the image content information was processed and extracted as traits inforamtion. 
 
 
-## collaboration
+## Collaboration
 
 
 SMART pipeline has been integreted into CyVerse cloud computing based webiste: PlantIT (https://plantit.cyverse.org/)
@@ -178,10 +178,10 @@ SMART pipeline has been also applied in collabration with following research ins
 <br/><br/> 
 <br/><br/> 
 <br/><br/> 
-<br/><br/> 
-<br/><br/> 
 
-Imaging protocol for SMART
+
+## Imaging protocol for SMART
+
 
 ![Optional Text](../master/media/plant.jpg)
 
