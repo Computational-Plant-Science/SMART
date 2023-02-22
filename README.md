@@ -184,6 +184,7 @@ SMART pipeline has been also applied in collabration with following research ins
 ![Optional Text](../master/media/plant.jpg)
 
 Setting up plants
+
     1. Place one plant in one tray.
     2. Use black color mesh to cover the soil.
     3. Place the maker object on the left corner of the tray.
