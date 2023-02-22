@@ -174,3 +174,9 @@ SMART pipeline has been also applied in collabration with following research ins
 
 5. Briony Parker at [Rothamsted Research](https://repository.rothamsted.ac.uk/staff/98225/briony-parker)
 
+
+
+
+Imaging protocole for SMART
+
+![Optional Text](../master/media/SMART_imaging_protocole.png)
