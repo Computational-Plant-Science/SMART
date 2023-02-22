@@ -177,6 +177,34 @@ SMART pipeline has been also applied in collabration with following research ins
 
 
 
-Imaging protocole for SMART
+Imaging protocol for SMART
 
-![Optional Text](../master/media/SMART_imaging_protocole.png)
+![Optional Text](../master/media/plant.jpg)
+
+Setting up plants
+    1. Place one plant in one tray.
+    2. Use black color mesh to cover the soil.
+    3. Place the maker object on the left corner of the tray.
+    4. Prefer the plant did not grow out of the boundaries of the tray.
+
+
+
+
+![Optional Text](../master/media/camera.jpg)
+
+Setting up camera
+
+    1. Camera lens should be parallel to the plant surface to capture an undistorted top view. 
+    2. The plant object should be in the center of the image and within the focus of the camera lens.
+    3. The depth of field should cover the different layers of the plant leaves. 
+    4. Higher resolution (e.g., an 8 Megapixel camera produces a file size that is 2448 x 3264 PPI) is suggested to acquire clear and sharp image data.
+
+
+
+Setting up the lighting environment
+    1. Diffuse lighting is suggested. 
+    2. Reduce shadow as much as possible.
+    3. Keep the illumination environment constant between imaging different plants. 
+    4. Avoid over exposure and reflection effect.
+
+
