@@ -44,7 +44,7 @@ ENV PIP_ROOT_USER_ACTION=ignore
 RUN pip3 install numpy \
     Pillow \
     scipy \
-    scikit-image \
+    scikit-image==0.19.3 \
     scikit-learn \
     matplotlib \
     pandas \
