@@ -1,4 +1,8 @@
-# Speedy Measurement of Arabidopsis Rosette Traits (SMART)
+# SMART: Speedy Measurement of Arabidopsis Rosette Traits
+
+Plant phenotyping using computer vision
+
+Compute shape traits and analyze colors of leaf surface  
 
 Author: Suxing Liu
 
@@ -15,11 +19,11 @@ Robust and parameter-free plant image segmentation and trait extraction.
 
 ## Sample work flow
 
-![Optional Text](../master/media/image_01.png)
+![Pipeline](../master/media/Slide1.png)
 
-![Optional Text](../master/media/Slide1.png)
+![Leaf surface color analysis](../master/media/Slide2.png)
 
-![Optional Text](../master/media/Slide2.png)
+![Monitor plant growth](../master/media/monitor_time_growth.gif)
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
