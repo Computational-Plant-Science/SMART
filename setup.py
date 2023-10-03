@@ -42,7 +42,7 @@ setuptools.setup(
         'scikit-image',
         'scikit-build',
         'scipy',
-        'Pillow==9.3.0',
+        'Pillow==10.0.1',
         'mayavi',
         'progressbar',
         'moviepy'
