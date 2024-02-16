@@ -17,6 +17,11 @@ USAGE:
 
 #Default image type: *.jpg
 
+
+![CI](https://github.com/Computational-Plant-Science/SMART/workflows/CI/badge.svg)
+
+![CI](https://github.com/Computational-Plant-Science/SMART/actions/workflows/plantit.yaml/badge.svg)
+
 '''
 
 # import the necessary packages

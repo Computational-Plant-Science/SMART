@@ -9,9 +9,7 @@ Author: Suxing Liu
 
 ##
 
-![CI](https://github.com/Computational-Plant-Science/SMART/workflows/CI/badge.svg)
 
-![CI](https://github.com/Computational-Plant-Science/SMART/actions/workflows/plantit.yaml/badge.svg)
 
 ![Optional Text](../master/media/Smart.png) 
 
