@@ -1,8 +1,10 @@
 # SMART: Speedy Measurement of Arabidopsis Rosette Traits
 
-Plant phenotyping using computer vision
+Speedy Measurement of Arabidopsis Rossette Traits for time-course monitoring morphological and physiological development
 
-Compute shape traits and analyze colors of leaf surface  
+Plant phenotyping using computer vision:
+
+Compute geometrical traits and analyze plant surface colors, 
 
 Author: Suxing Liu
 
