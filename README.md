@@ -14,10 +14,10 @@ Robust and parameter-free plant image segmentation and trait extraction.
 
 1. Process with plant image top view, including whole tray plant image, this tool will segment it into individual images.
 2. Robust segmentation based on parameter-free color clustering method.
-3. Extract individual plant gemetrical traits, and write output into excel file.
+3. Extract individual plant geometrical traits, and write output into an Excel file.
 
 
-## Sample work flow
+## Sample workflow
 
 ![Pipeline](../master/media/Slide1.png)
 
@@ -29,10 +29,7 @@ Robust and parameter-free plant image segmentation and trait extraction.
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Contents**
 
-- [Requirements](#requirements)
-- [Usage](#usage)
-
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+<!-- END doctoc generated TOC please keep comment here to allow auto-update -->
 
 
 
@@ -45,28 +42,28 @@ Robust and parameter-free plant image segmentation and trait extraction.
 
 trait.xlsx, trait.csv
 
-Excel or csv file which contain traits computation values.
+Excel or csv file which contains trait computation values.
 
 
-## Usage in local environment by cloning the whole GitHub repo 
+## Usage in the local environment by cloning the whole GitHub repo 
 
 sample test
 
 Input: Individual plant top view images, in jpg or png format
 
-Output: Realted folders with same name of inout image files, which contains image results
+Output: Realted folders with the same name of input image files, which contain image results
 
-and trait.xlsx and trait.csv for summary of traits computation results. 
+and trait.xlsx and trait.csv for a summary of trait computation results. 
 
 
 Input image requirement:
 
-Plant top view image captured by HD resolution RGB camera, prefer black background with even illumination environment. 
+Plant top view image captured by HD resolution RGB camera, prefer a black background with even illumination environment. 
 
-Example input can be downled from "/sample_test/" folder, which contains top view images of a same Arabidopsis plant from different timepoints. 
+Example input can be downloaded from the "/sample_test/" folder, which contains top-view images of the same Arabidopsis plant from different time points. 
 
 
-1. Download the repo into local host PC:
+1. Download the repo into the local host PC:
 
 ```bash
 
@@ -74,11 +71,11 @@ Example input can be downled from "/sample_test/" folder, which contains top vie
 
 ```
 
-   Now you should have a clone of the SMART pipeine source code in your local PC, the folder path was:
+   Now you should have a clone of the SMART pipeline source code in your local PC, the folder path was:
 ```
    /$host_path/SMART/
    
-    Note: $host_path can be any path chosen by user. 
+    Note: $host_path can be any path chosen by the user. 
 ```
 
 2. Prepare your input image folder path,
@@ -97,9 +94,9 @@ Example input can be downled from "/sample_test/" folder, which contains top vie
    python3 /opt/smart/core/trait_extract_parallel_demo.py -p /$host_path/SMART/sample_test/ `
 
 ```
-Results will be generated in the same input folder, however, user can specify the output folder by adding "-r /path/to/output/folder"
+Results will be generated in the same input folder, however, the user can specify the output folder by adding "-r /path/to/output/folder"
 
-Default input image type as jpg, can be changed by adding parameter such as " -ft png".
+The default input image type jpg, can be changed by adding a parameter such as " -ft png".
 
 E.g. 
 
@@ -110,7 +107,7 @@ E.g.
 ```
 
 
-## Usage for Docker contianer 
+## Usage for Docker container 
 
 
 [Docker](https://www.docker.com/) is suggested to run this project in a Unix environment.
@@ -151,22 +148,22 @@ For example, to run the sample test inside this repo, under the folder "sample_t
 
 ```
 
-Results will be generated in the same input folder, trait.xlsx and trait.csv contains traits computation results.
+Results will be generated in the same input folder, trait.xlsx and trait.csv, which contains trait computation results.
 
-The other folde with the same name of inout images contains all related image results for visualization purpose. 
+The other folder with the same name of input images contains all related image results for visualization purposes. 
 
-They are processed copies of the original images, all the image content information was processed and extracted as traits inforamtion. 
+They are processed copies of the original images, all the image content information was processed and extracted as traits information. 
 
 
 ## Collaboration
 
 
-SMART pipeline has been integreted into CyVerse cloud computing based webiste: PlantIT (https://plantit.cyverse.org/)
+The SMART pipeline has been integrated into CyVerse cloud computing-based website: PlantIT (https://plantit.cyverse.org/)
 
-CyVerse user can upload data and run the SMART pipeline for free. 
+CyVerse users can upload data and run the SMART pipeline for free. 
 
 
-SMART pipeline has been also applied in collabration with following research institutes and company: 
+The SMART pipeline has also been applied in collaboration with following research institutes and companies: 
 
 1. Dr. David G. Mendoza-Cozatl at [University of Missouri](https://cafnr.missouri.edu/person/david-mendoza-cozatl/)
 
@@ -201,10 +198,10 @@ Setting up plants
 
 Setting up camera
 
-    1. Camera lens should be parallel to the plant surface to capture an undistorted top view. 
+    1. The camera lens should be parallel to the plant surface to capture an undistorted top view. 
     2. The plant object should be in the center of the image and within the focus of the camera lens.
     3. The depth of field should cover the different layers of the plant leaves. 
-    4. Higher resolution (e.g., an 8 Megapixel camera produces a file size that is 2448 x 3264 PPI) is suggested to acquire clear and sharp image data.
+    4. Higher resolution (e.g., an 8-megapixel camera produces a file size that is 2448 x 3264 PPI) is suggested to acquire clear and sharp image data.
 
 
 
@@ -213,6 +210,6 @@ Setting up the lighting environment
     1. Diffuse lighting is suggested. 
     2. Reduce shadow as much as possible.
     3. Keep the illumination environment constant between imaging different plants. 
-    4. Avoid over exposure and reflection effect.
+    4. Avoid overexposure and reflection effects.
 
 
