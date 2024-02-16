@@ -7,11 +7,11 @@ Compute shape traits and analyze colors of leaf surface
 Author: Suxing Liu
 
 
-https://github.com/Computational-Plant-Science/SMART.git
+##
 
-gh repo clone Computational-Plant-Science/SMART
+![CI](https://github.com/Computational-Plant-Science/SMART/workflows/CI/badge.svg)
 
-![CI](https://https://github.com/CComputational-Plant-Science/SMART/plantit.yaml/badge.svg)
+![CI](https://https://github.com/CComputational-Plant-Science/SMART/actions/workflows/plantit.yaml/badge.svg)
 
 ![Optional Text](../master/media/Smart.png) 
 
