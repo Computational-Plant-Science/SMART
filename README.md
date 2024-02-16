@@ -44,6 +44,10 @@ trait.xlsx, trait.csv
 
 Excel or csv file which contains trait computation values.
 
+## Traits summary
+
+![Pipeline](../master/media/traits_summary.png)
+
 
 ## Usage in the local environment by cloning the whole GitHub repo 
 
