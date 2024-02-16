@@ -39,10 +39,10 @@ setuptools.setup(
         'opencv-python',
         'matplotlib',
         'scikit-learn',
-        'scikit-image',
+        'scikit-image==0.19.3',
         'scikit-build',
         'scipy',
-        'Pillow==9.3.0',
+        'Pillow==10.0.1',
         'mayavi',
         'progressbar',
         'moviepy'

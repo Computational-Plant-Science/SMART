@@ -13,7 +13,7 @@ Created: 2018-09-29
 
 USAGE:
 
-time python3 trait_extract_parallel_demo.py -p ~/example/plant_test/  -ft jpg
+    time python3 trait_extract_parallel_demo.py -p ~/example/plant_test/  -ft jpg
 
 #Default image type: *.jpg
 

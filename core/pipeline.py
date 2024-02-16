@@ -9,12 +9,12 @@ Author-email: suxingliu@gmail.com
 
 USAGE:
 
-python pipeline.py -p /home/suxingliu/plant-image-analysis/random_test/ -ft jpg
+    python3 pipeline.py -p /home/suxingliu/plant-image-analysis/random_test/ -ft jpg
 
 parameter list:
 
- ap.add_argument("-p", "--path", required = True, help = "path to image file")
- ap.add_argument("-ft", "--filetype", required=True,    help="Image filetype")
+    ap.add_argument("-p", "--path", required = True, help = "path to image file")
+    ap.add_argument("-ft", "--filetype", required=True,    help="Image filetype")
 
 
 """
@@ -23,23 +23,7 @@ import subprocess, os
 import sys
 import argparse
 
-'''
-def execute_script(cmd_line):
-    """execute script inside program"""
-    try:
-        print(cmd_line)
-        
-        process = subprocess.Popen(cmd_line, shell=True, stdout=subprocess.PIPE)
-        
-        process.wait()
-        
-        #print process.returncode
-        
-    except OSError:
-        
-        print("Failed ...!\n")
 
-'''
 def execute_script(cmd_line):
     """execute script inside program"""
     
