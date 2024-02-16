@@ -6,7 +6,12 @@ Compute shape traits and analyze colors of leaf surface
 
 Author: Suxing Liu
 
-![CI](https://github.com/Computational-Plant-Science/arabidopsis-rosette-analysis/workflows/CI/badge.svg)
+
+https://github.com/Computational-Plant-Science/SMART.git
+
+gh repo clone Computational-Plant-Science/SMART
+
+![CI](https://https://github.com/CComputational-Plant-Science/SMART/plantit.yaml/badge.svg)
 
 ![Optional Text](../master/media/Smart.png) 
 
