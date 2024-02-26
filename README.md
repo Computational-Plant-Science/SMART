@@ -186,6 +186,8 @@ The SMART pipeline has also been applied in collaboration with following researc
 
 5. Briony Parker at [Rothamsted Research](https://repository.rothamsted.ac.uk/staff/98225/briony-parker)
 
+6. Dr. Fiona L. Goggin at [University of Arkansas](https://enpl.uark.edu/people/faculty/uid/fgoggin/name/Fiona+Goggin/)
+
 
 <br/><br/> 
 
