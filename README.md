@@ -28,6 +28,8 @@ Robust and parameter-free plant image segmentation and trait extraction.
 
 ![Leaf surface color analysis](../master/media/Slide2.png)
 
+![Plant color analysis using Color Checker](../master/media/Slide3.png)
+
 ![Monitor plant growth](../master/media/monitor_time_growth.gif)
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
