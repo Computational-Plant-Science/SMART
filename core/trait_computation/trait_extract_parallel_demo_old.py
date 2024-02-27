@@ -13,8 +13,14 @@ Created: 2018-09-29
 
 USAGE:
 
-time python3 trait_extract_parallel_demo.py -p ~/example/plant_test/mi_test/ -ft png 
+    time python3 trait_extract_parallel_demo.py -p ~/example/plant_test/  -ft jpg
 
+#Default image type: *.jpg
+
+
+![CI](https://github.com/Computational-Plant-Science/SMART/workflows/CI/badge.svg)
+
+![CI](https://github.com/Computational-Plant-Science/SMART/actions/workflows/plantit.yaml/badge.svg)
 
 '''
 
@@ -81,6 +87,26 @@ import matplotlib.colors
 
 
 MBFACTOR = float(1<<20)
+
+
+
+def check_file_type(image_folder_path, allowed_extensions=None):
+    if allowed_extensions is None:
+        allowed_extensions = ['.jpg', '.png', '.jpeg', 'JPG']
+
+    no_files_in_folder = len(glob.glob(image_folder_path+"/*")) 
+    extension_type = ""
+    no_files_allowed = 0
+
+    for ext in allowed_extensions:
+      no_files_allowed = len(glob.glob(image_folder_path+"/*"+ext))
+      if no_files_allowed > 0:
+        extension_type = ext
+        break
+
+    assert no_files_in_folder == no_files_allowed, "The extension in the folder should all be the same, but found more than one extensions"
+    return extension_type
+
 
 class ComputeCurvature:
 
@@ -445,57 +471,73 @@ def circle_detection(image):
     idx_closest = 0
     
     
-    # convert the (x, y) coordinates and radius of the circles to integers
-    circles = np.round(circles[0, :]).astype("int")
-    
-    if len(circles) > 1:
+    # At leaset one circle is found
+    if circles is not None:
         
-        print("More than one circles were found!")
+        # Get the (x, y, r) as integers, convert the (x, y) coordinates and radius of the circles to integers
+        circles = np.round(circles[0, :]).astype("int")
+       
+        if len(circles) < 2:
+           
+            print("Only one circle was found!\n")
+           
+        else:
+            
+            print("More than one circles were found!\n")
         
-        idx_closest = 0
+            idx_closest = 0
+        
+            cv2.circle(output, (x, y), r, (0, 255, 0), 2)
+          
+        # loop over the circles and the (x, y) coordinates to get radius of the circles
+        for (x, y, r) in circles:
+            
+            coord = (x, y)
+            
+            circle_center_coord.append(coord)
+            circle_center_radius.append(r)
+
+        if idx_closest == 0:
+
+            print("Circle marker with radius = {} was detected!\n".format(circle_center_radius[idx_closest]))
+        
+        '''
+        # draw the circle in the output image, then draw a center
+        circle_detection_img = cv2.circle(output, circle_center_coord[idx_closest], circle_center_radius[idx_closest], (0, 255, 0), 4)
+        circle_detection_img = cv2.circle(output, circle_center_coord[idx_closest], 5, (0, 128, 255), -1)
+
+        # compute the diameter of coin
+        diameter_circle = circle_center_radius[idx_closest]*2
+
+
+        tmp_mask = np.zeros([img_width, img_height], dtype=np.uint8)
+
+        tmp_mask = cv2.circle(tmp_mask, circle_center_coord[idx_closest], circle_center_radius[idx_closest] + 5, (255, 255, 255), -1)
+
+        tmp_mask_binary = cv2.threshold(tmp_mask, 128, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
+
+        masked_tmp = cv2.bitwise_and(image.copy(), image.copy(), mask = ~tmp_mask_binary)
+        '''
+
+        (startX, startY) = circle_center_coord[idx_closest]
+
+        endX = startX + int(r*1.2) + 1050
+        endY = startY + int(r*1.2) + 1050
+        
+        # for debug purpose, circle marker based segmentation
+        #sticker_crop_img = output[startY:endY, startX:endX]
+        
+        sticker_crop_img = output
     
     else:
-
-        # ensure at least some circles were found
-        if circles is not None and len(circles) > 0:
-            
-            idx_closest = 0
-    
-    # loop over the (x, y) coordinates and radius of the circles
-    for (x, y, r) in circles:
         
-        coord = (x, y)
+        print("No circle was found!\n")
         
-        circle_center_coord.append(coord)
-        circle_center_radius.append(r)
-
-    if idx_closest == 0:
-    
-        print("Circle marker with radius = {} was detected!\n".format(circle_center_radius[idx_closest]))
-    '''
-    # draw the circle in the output image, then draw a center
-    circle_detection_img = cv2.circle(output, circle_center_coord[idx_closest], circle_center_radius[idx_closest], (0, 255, 0), 4)
-    circle_detection_img = cv2.circle(output, circle_center_coord[idx_closest], 5, (0, 128, 255), -1)
-
-    # compute the diameter of coin
-    diameter_circle = circle_center_radius[idx_closest]*2
+        sticker_crop_img = output
+        
+        diameter_circle = 0
     
     
-    tmp_mask = np.zeros([img_width, img_height], dtype=np.uint8)
-    
-    tmp_mask = cv2.circle(tmp_mask, circle_center_coord[idx_closest], circle_center_radius[idx_closest] + 5, (255, 255, 255), -1)
-    
-    tmp_mask_binary = cv2.threshold(tmp_mask, 128, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
-    
-    masked_tmp = cv2.bitwise_and(image.copy(), image.copy(), mask = ~tmp_mask_binary)
-    '''
-    
-    (startX, startY) = circle_center_coord[idx_closest]
-    
-    endX = startX + int(r*1.2) + 1050
-    endY = startY + int(r*1.2) + 1050
-    
-    sticker_crop_img = output[startY:endY, startX:endX]
     
     
     return circles, sticker_crop_img, diameter_circle
@@ -1554,7 +1596,7 @@ def extract_traits(image_file):
         #print(result_file)
         cv2.imwrite(result_file, sticker_overlay)
         '''
-        
+        '''
         (circles, sticker_crop_img, diameter_circle) = circle_detection(orig) 
 
         # save result
@@ -1563,9 +1605,11 @@ def extract_traits(image_file):
         
         
         orig = sticker_crop_img.copy()
+        '''
         
-        #orig = sticker_crop_img.copy()
+        sticker_crop_img = orig.copy()
         
+                
         #color clustering based plant object segmentation
         thresh = color_cluster_seg(orig, args_colorspace, args_channels, args_num_clusters)
         # save segmentation result
@@ -1582,6 +1626,9 @@ def extract_traits(image_file):
         
          #find external contour 
         (trait_img, area, solidity, max_width, max_height) = comp_external_contour(orig, thresh)
+        
+        
+        
         # save segmentation result
         result_file = (save_path + base_name + '_excontour' + file_extension)
         #print(filename)
@@ -1664,6 +1711,8 @@ def extract_traits(image_file):
         #plt.imsave(result_file, img_as_float(labels), cmap = "Spectral")
         cv2.imwrite(result_file, labeled_img)
         
+        sticker_crop_img = orig.copy()
+        
         (avg_curv, label_trait, track_trait, leaf_index_rec, contours_rec, area_rec, curv_rec, solidity_rec, major_axis_rec, minor_axis_rec, leaf_color_ratio_rec, leaf_color_value_rec, box_coord_rec) = leaf_traits_computation(sticker_crop_img.copy(), labels, save_path, base_name, file_extension)
         
 
@@ -1722,7 +1771,11 @@ if __name__ == '__main__':
     
     # setting path to model file
     file_path = args["path"]
-    ext = args['filetype']
+    
+    if (args['filetype']):
+        ext = "jpg"
+    else:
+        ext = args['filetype']
     
     min_size = args['min_size']
     min_distance_value = args['min_dist']
@@ -1852,12 +1905,12 @@ if __name__ == '__main__':
         #Get the current Active Sheet
         sheet = wb['plant morphological traits']
 
-        sheet.delete_rows(2, sheet_pixel.max_row - 1) # for entire sheet
+        sheet.delete_rows(2, sheet.max_row - 1) # for entire sheet
 
         #Get the current Active Sheet
         sheet_cm = wb['leaf specific traits']
 
-        sheet_cm.delete_rows(2, sheet_cm.max_row - 1) # for entire sheet
+        sheet_cm.delete_rows(2, sheet_leaf.max_row - 1) # for entire sheet
         
         
 
@@ -1930,14 +1983,14 @@ if __name__ == '__main__':
     
     
     
-    '''
+    
     wb = openpyxl.load_workbook(trait_file)
     sh = wb.active # was .get_active_sheet()
     with open(trait_file_csv, 'w', newline = "") as f:
         c = csv.writer(f)
         for r in sh.rows: # generator; was sh.rows
             c.writerow([cell.value for cell in r])
-    '''
+    
 
     
 

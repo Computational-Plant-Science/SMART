@@ -59,7 +59,7 @@ def process_sample(name,path,args):
     
     settings = args['settings']['params']
     
-    trait_extract_parallel = "python /opt/smart_core/trait_extract_parallel_demo.py -p " + current_path + "/" + " -ft " + str(settings['filetype'])
+    trait_extract_parallel = "python3 /opt/smart_core/trait_extract_parallel_demo.py -p " + current_path + "/" + " -ft " + str(settings['filetype'])
     
     print("Analyzing the traits of plant images...\n")
     

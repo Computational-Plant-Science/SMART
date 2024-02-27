@@ -82,7 +82,29 @@ import matplotlib.colors
 
 
 
+
 MBFACTOR = float(1<<20)
+
+
+def check_file_type(image_folder_path, allowed_extensions=None):
+    
+    if allowed_extensions is None:
+        allowed_extensions = ['.jpg', '.png', '.jpeg']
+
+    no_files_in_folder = len(glob.glob(image_folder_path+"/*")) 
+    extension_type = ""
+    no_files_allowed = 0
+
+    for ext in allowed_extensions:
+      no_files_allowed = len(glob.glob(image_folder_path+"/*"+ext))
+      if no_files_allowed > 0:
+        extension_type = ext
+        #break
+
+    #assert no_files_in_folder == no_files_allowed, "The extension in the folder should all be the same, but found more than one extensions"
+    return extension_type
+
+
 
 class ComputeCurvature:
 
@@ -2437,7 +2459,7 @@ if __name__ == '__main__':
     
     ap = argparse.ArgumentParser()
     ap.add_argument("-p", "--path", required = True,    help="path to image file")
-    ap.add_argument("-ft", "--filetype", required=True,    help="Image filetype")
+    ap.add_argument("-ft", "--filetype", required = False, default ='jpg', help="Image filetype")
     ap.add_argument("-r", "--result", required = False,    help="result path")
     ap.add_argument('-s', '--color-space', type = str, required = False, default ='lab', help='Color space to use: BGR, HSV, Lab, YCrCb (YCC)')
     ap.add_argument('-c', '--channels', type = str, required = False, default='1', help='Channel indices to use for clustering, where 0 is the first channel,' 
@@ -2458,17 +2480,35 @@ if __name__ == '__main__':
     
     # setting path to model file
     file_path = args["path"]
-    ext = args['filetype']
+    #ext = args['filetype']
+    
+    
+    if (args['filetype']):
+        
+        extensions_present = check_file_type(file_path, allowed_extensions = None)
+        
+        print("Found image files with extensions_present = {} in current folder!\n".format(extensions_present))
+        
+        filetype = '*' + extensions_present
+        
+    else:
+        ext = args['filetype']
+        filetype = '*.' + ext
+    
+    
+    #extensions_present = check_file_type(file_path, allowed_extensions = None)
+
+    
+    
     
     min_size = args['min_size']
-    
-    
+
     min_distance_value = args['min_dist']
     
     diagonal_line_length = args['min_dist']
 
     #accquire image file list
-    filetype = '*.' + ext
+    #filetype = '*.' + ext
     image_file_path = file_path + filetype
     
     #accquire image file list
