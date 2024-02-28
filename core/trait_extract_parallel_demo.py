@@ -805,26 +805,11 @@ def circle_detection(image):
     return circles, sticker_crop_img, diameter_circle
 
 
-
+'''
 # Detect stickers in the image
 def sticker_detect(img_ori):
     
-    '''
-    image_file_name = Path(image_file).name
-    
-    abs_path = os.path.abspath(image_file)
-    
-    filename, file_extension = os.path.splitext(abs_path)
-    base_name = os.path.splitext(os.path.basename(filename))[0]
-    
-    print("Processing image : {0}\n".format(str(image_file)))
-     
-    # save folder construction
-    mkpath = os.path.dirname(abs_path) +'/cropped'
-    mkdir(mkpath)
-    save_path = mkpath + '/'
-    print ("results_folder: " + save_path)
-    '''
+
    
 
     # load the image, clone it for output, and then convert it to grayscale
@@ -873,14 +858,6 @@ def sticker_detect(img_ori):
         endX = startX + template.shape[0] + 1050 + 110
         endY = startY + template.shape[1] + 1050 + 110
         
-        '''
-        (startX, startY) = max_loc
-        startX = startX - 100
-        startY = startY
-        
-        endX = startX + template.shape[1] + int(w*0.8)
-        endY = startY + template.shape[0] + int(h*0.8)
-        '''
         
         # Draw a rectangle around the matched region. 
         for pt in zip(*loc[::-1]): 
@@ -893,7 +870,7 @@ def sticker_detect(img_ori):
 
     return  sticker_crop_img, sticker_overlay
 
-'''
+
 def individual_object_seg(orig, labels, save_path, base_name, file_extension):
     
     num_clusters = 5
@@ -2458,7 +2435,7 @@ if __name__ == '__main__':
     ap = argparse.ArgumentParser()
     ap.add_argument("-p", "--path", required = True,    help="path to image file")
     ap.add_argument("-ft", "--filetype", required = False, default ='jpg', help="Image filetype")
-    ap.add_argument("-r", "--result", required = False,    help="result path")
+    ap.add_argument("-r", "--result", required = False,    help = "result path")
     ap.add_argument('-s', '--color-space', type = str, required = False, default ='lab', help='Color space to use: BGR, HSV, Lab, YCrCb (YCC)')
     ap.add_argument('-c', '--channels', type = str, required = False, default='1', help='Channel indices to use for clustering, where 0 is the first channel,' 
                                                                        + ' 1 is the second channel, etc. E.g., if BGR color space is used, "02" ' 
@@ -2467,7 +2444,6 @@ if __name__ == '__main__':
     ap.add_argument('-min', '--min_size', type = int, required = False, default = 100,  help = 'min size of object to be segmented.')
     ap.add_argument('-max', '--max_size', type = int, required = False, default = 1000000,  help = 'max size of object to be segmented.')
     ap.add_argument('-md', '--min_dist', type = int, required = False, default = 50,  help = 'distance threshold of watershed segmentation.')
-    ap.add_argument("-tp", "--temp_path", required = False,  help="template image path")
     ap.add_argument("-da", "--diagonal", type = float, required = False,  default = math.sqrt(2), help="diagonal line length(cm) of indiviudal color checker module")
     ap.add_argument("-cc", "--cue_color", type = int, required = False,  default = 0, help="use color cue to detect plant object")
     ap.add_argument("-cl", "--cue_loc", type = int, required = False,  default = 0, help="use location cue to detect plant object")
@@ -2512,19 +2488,6 @@ if __name__ == '__main__':
     #accquire image file list
     imgList = sorted(glob.glob(image_file_path))
     
-    global  template
-    template_path = args['temp_path']
-    
-    if not template_path:
-        # Read the template 
-        template = cv2.imread(template_path, 0) 
-        
-        if template is None:
-            print("template image is empty!\n")
-        else:
-            print("template image loaded!\n")
-    else:
-        print("template path empty\n")
         
 
     #print((imgList))
