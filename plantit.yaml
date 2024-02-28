@@ -3,11 +3,8 @@ author: Suxing Liu
 public: True
 doi: 10.1101/2021.12.17.472861
 image: docker://computationalplantscience/smart
-commands: python3 /opt/smart/core/trait_extract_parallel_demo.py -p $INPUT -ft $FILETYPE -s $COLOR-SPACE -c $CHANNELS -n $NUM_CLUSTERS -min $MIN_SIZE -min $MAX_SIZE -md $MIN_DIST -da $DIAGONAL -cc $CUE_COLOR -cl $CUE_LOC -ob $OUT_BOUNDARY
+commands: python3 /opt/smart/core/trait_extract_parallel_demo.py -p $INPUT -s $COLOR-SPACE -c $CHANNELS -n $NUM_CLUSTERS -min $MIN_SIZE -min $MAX_SIZE -md $MIN_DIST -da $DIAGONAL -cc $CUE_COLOR -cl $CUE_LOC -ob $OUT_BOUNDARY
 params:
-  - name: filetype
-    type: String
-    default: jpg
   - name: color-space
     type: String
     default: lab
