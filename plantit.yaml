@@ -23,41 +23,9 @@ jobqueue:
   cores: 12
 
 params:
-  - name: color-space
+  - name: filetype
     type: String
-    default: lab
-  - name: channels
-    type: String
-    default: 1
-  - name: num-clusters
-    type: number
-    default: 2
-    step: 1
-    min: 2
-    max: 5
-  - name: min_size
-    type: number
-    default: 10000
-    step: 100
-    min: 100
-    max: 2000
-  - name: max_size
-    type: number
-    default: 1000000
-    step: 1000
-    min: 100000
-    max: 10000000
-  - name: min_dist
-    type: number
-    default: 50
-    step: 1
-    min: 15
-    max: 100
-  - name: diagonal
-    type: number
-    default: 1.41421356237
-    step: 1
-    min: 1
-    max: 10
+    default: jpg
+
     
 

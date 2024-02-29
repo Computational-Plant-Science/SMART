@@ -2436,7 +2436,7 @@ if __name__ == '__main__':
     
     ap = argparse.ArgumentParser()
     ap.add_argument("-p", "--path", dest = "path", type = str, required = True,    help = "path to image file")
-    #ap.add_argument("-ft", "--filetype", required = False, default ='jpg', help = "Image filetype")
+    ap.add_argument("-ft", "--filetype", dest = "filetype", type = str, required = False, default ='jpg', help = "Image filetype")
     ap.add_argument("-o", "--output_path", dest = "output_path", type = str, required = False,    help = "result path")
     ap.add_argument('-s', '--color_space', dest = "color_space", type = str, required = False, default ='lab', help='Color space to use: BGR, HSV, Lab, YCrCb (YCC)')
     ap.add_argument('-c', '--channels', dest = "channels", type = str, required = False, default='1', help='Channel indices to use for clustering, where 0 is the first channel,' 
@@ -2457,7 +2457,7 @@ if __name__ == '__main__':
     # setting path to model file
     file_path = args["path"]
     
-    '''
+    
     if (args['filetype']):
         
         extensions_present = check_file_type(file_path, allowed_extensions = None)
@@ -2467,9 +2467,8 @@ if __name__ == '__main__':
         filetype = '*' + extensions_present
         
     else:
-        ext = args['filetype']
-        filetype = '*.' + ext
-    '''
+        filetype = '*.' + args['filetype']
+    
     
    
     
@@ -2480,8 +2479,6 @@ if __name__ == '__main__':
     diagonal_line_length = args['min_dist']
 
     #accquire image file list
-    ext = 'jpg' 
-    filetype = '*.' + ext
     image_file_path = file_path + filetype
     
     #accquire image file list
