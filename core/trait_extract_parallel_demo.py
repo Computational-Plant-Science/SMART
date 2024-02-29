@@ -349,9 +349,8 @@ def color_cluster_seg(image, args_colorspace, args_channels, args_num_clusters):
     
     ret, thresh = cv2.threshold(kmeansImage,0,255,cv2.THRESH_BINARY | cv2.THRESH_OTSU)
     
-    
+    '''
     if args['out_boundary']:
-        
         thresh_cleaned = (thresh)
     
     else:
@@ -361,7 +360,13 @@ def color_cluster_seg(image, args_colorspace, args_channels, args_num_clusters):
             thresh_cleaned = clear_border(thresh)
         else:
             thresh_cleaned = thresh
+    '''
     
+    if np.count_nonzero(thresh) > 0:
+        
+        thresh_cleaned = clear_border(thresh)
+    else:
+        thresh_cleaned = thresh
 
     (numLabels, labels, stats, centroids) = cv2.connectedComponentsWithStats(thresh_cleaned, connectivity = 8)
 
@@ -450,7 +455,7 @@ def color_cluster_seg(image, args_colorspace, args_channels, args_num_clusters):
         img_thresh = closing
         
     
-    
+    '''
     if args["cue_color"] == 1:
     
         img_mask = np.zeros([height, width], dtype="uint8")
@@ -480,15 +485,17 @@ def color_cluster_seg(image, args_colorspace, args_channels, args_num_clusters):
                 #img_mask = cv2.drawContours(img_mask, c, -1, (255), -1)
                 img_mask = cv2.drawContours(image=img_mask, contours=[c], contourIdx=-1, color=(255,255,255), thickness=cv2.FILLED)
                 #img_mask = cv2.fillPoly(img_mask, pts = [contours], color =(255,255,255))
-                
-        img_thresh = img_mask
+       
+       
+            img_thresh = img_mask
     
-    
+    '''
         
     
     
     ###################################################################################################
     # use location based selection of plant object, keep the componnent cloest to the center
+    '''
     if args["cue_loc"] == 1:
     
         # location based selection of plant object
@@ -528,7 +535,7 @@ def color_cluster_seg(image, args_colorspace, args_channels, args_num_clusters):
          
             img_thresh[labels == idx_closest] = 255
          
-    
+    '''
     
     
     #return img_thresh
@@ -1885,14 +1892,9 @@ def extract_traits(image_file):
     print("Exacting traits for image : {0}\n".format(str(image_file_name)))
      
     # save folder construction
-    if (args['result']):
-        save_path = args['result']
+    if (args['output_path']):
+        save_path = args['output_path']
     else:
-         # save folder construction
-        #mkpath = os.path.dirname(abs_path) +'/marker_detection'
-        #mkdir(mkpath)
-        #marker_save_path = mkpath + '/'
-        
         mkpath = os.path.dirname(abs_path) + '/' + base_name + '/plant_result'
         mkdir(mkpath)
         save_path = mkpath + '/'
@@ -1907,7 +1909,7 @@ def extract_traits(image_file):
     print("color_checker_path:  {0}\n".format(str(color_checker_path)))
     
     
-    ##############################
+    #########################################################################################
 
     
         
@@ -2433,30 +2435,29 @@ def extract_traits(image_file):
 if __name__ == '__main__':
     
     ap = argparse.ArgumentParser()
-    ap.add_argument("-p", "--path", required = True,    help="path to image file")
-    ap.add_argument("-ft", "--filetype", required = False, default ='jpg', help="Image filetype")
-    ap.add_argument("-r", "--result", required = False,    help = "result path")
-    ap.add_argument('-s', '--color-space', type = str, required = False, default ='lab', help='Color space to use: BGR, HSV, Lab, YCrCb (YCC)')
-    ap.add_argument('-c', '--channels', type = str, required = False, default='1', help='Channel indices to use for clustering, where 0 is the first channel,' 
+    ap.add_argument("-p", "--path", dest = "path", type = str, required = True,    help = "path to image file")
+    #ap.add_argument("-ft", "--filetype", required = False, default ='jpg', help = "Image filetype")
+    ap.add_argument("-o", "--output_path", dest = "output_path", type = str, required = False,    help = "result path")
+    ap.add_argument('-s', '--color_space', dest = "color_space", type = str, required = False, default ='lab', help='Color space to use: BGR, HSV, Lab, YCrCb (YCC)')
+    ap.add_argument('-c', '--channels', dest = "channels", type = str, required = False, default='1', help='Channel indices to use for clustering, where 0 is the first channel,' 
                                                                        + ' 1 is the second channel, etc. E.g., if BGR color space is used, "02" ' 
                                                                        + 'selects channels B and R. (default "all")')
-    ap.add_argument('-n', '--num-clusters', type = int, required = False, default = 2,  help = 'Number of clusters for K-means clustering (default 2, min 2).')
-    ap.add_argument('-min', '--min_size', type = int, required = False, default = 100,  help = 'min size of object to be segmented.')
-    ap.add_argument('-max', '--max_size', type = int, required = False, default = 1000000,  help = 'max size of object to be segmented.')
-    ap.add_argument('-md', '--min_dist', type = int, required = False, default = 50,  help = 'distance threshold of watershed segmentation.')
-    ap.add_argument("-da", "--diagonal", type = float, required = False,  default = math.sqrt(2), help="diagonal line length(cm) of indiviudal color checker module")
-    ap.add_argument("-cc", "--cue_color", type = int, required = False,  default = 0, help="use color cue to detect plant object")
-    ap.add_argument("-cl", "--cue_loc", type = int, required = False,  default = 0, help="use location cue to detect plant object")
-    ap.add_argument("-ob", "--out_boundary", type = int, required = False,  default = 0, help="whether the plant object was out of the image boudary or not, 1 yes, 0 no, default 0")
+    ap.add_argument('-n', '--num_clusters', dest = "num_clusters", type = int, required = False, default = 2,  help = 'Number of clusters for K-means clustering (default 2, min 2).')
+    ap.add_argument('-min', '--min_size', dest = "min_size", type = int, required = False, default = 10000,  help = 'min size of object to be segmented.')
+    ap.add_argument('-max', '--max_size', dest = "max_size", type = int, required = False, default = 1000000,  help = 'max size of object to be segmented.')
+    ap.add_argument('-md', '--min_dist', dest = "min_dist", type = int, required = False, default = 25,  help = 'distance threshold of watershed segmentation.')
+    ap.add_argument("-da", "--diagonal", dest = "diagonal", type = float, required = False,  default = math.sqrt(2), help = "diagonal line length(cm) of indiviudal color checker module")
+    #ap.add_argument("-cc", "--cue_color", dest = "cue_color", type = int, required = False,  default = 0, help="use color cue to detect plant object")
+    #ap.add_argument("-cl", "--cue_loc", dest = "cue_loc", type = int, required = False,  default = 0, help="use location cue to detect plant object")
+    #ap.add_argument("-ob", "--out_boundary", dest = "out_boundary", type = int, required = False,  default = 0, help="whether the plant object was out of the image boudary or not, 1 yes, 0 no, default 0")
     
     args = vars(ap.parse_args())
     
     
     # setting path to model file
     file_path = args["path"]
-    #ext = args['filetype']
     
-    
+    '''
     if (args['filetype']):
         
         extensions_present = check_file_type(file_path, allowed_extensions = None)
@@ -2468,12 +2469,9 @@ if __name__ == '__main__':
     else:
         ext = args['filetype']
         filetype = '*.' + ext
+    '''
     
-    
-    #extensions_present = check_file_type(file_path, allowed_extensions = None)
-
-    
-    
+   
     
     min_size = args['min_size']
 
@@ -2482,7 +2480,8 @@ if __name__ == '__main__':
     diagonal_line_length = args['min_dist']
 
     #accquire image file list
-    #filetype = '*.' + ext
+    ext = 'jpg' 
+    filetype = '*.' + ext
     image_file_path = file_path + filetype
     
     #accquire image file list
@@ -2567,14 +2566,13 @@ if __name__ == '__main__':
     
 
     
-    if (args['result']):
+    if (args['output_path']):
+        trait_file = (args['output_path'] + 'trait.xlsx')
 
-        trait_file = (args['result'] + 'trait.xlsx')
-        trait_file_csv = (args['result'] + 'trait.csv')
     else:
         trait_file = (file_path + 'trait.xlsx')
-        trait_file_csv = (file_path + 'trait.csv')
-    
+
+
     
     if os.path.isfile(trait_file):
         # update values
