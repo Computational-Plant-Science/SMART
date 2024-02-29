@@ -3,38 +3,11 @@ author: Suxing Liu
 public: True
 doi: 10.1101/2021.12.17.472861
 image: docker://computationalplantscience/smart
-commands: python3 /opt/smart/core/trait_extract_parallel_demo.py -p $INPUT -s $COLOR-SPACE -c $CHANNELS -n $NUM_CLUSTERS -min $MIN_SIZE -min $MAX_SIZE -md $MIN_DIST -da $DIAGONAL -cc $CUE_COLOR -cl $CUE_LOC -ob $OUT_BOUNDARY
+commands: /opt/smart/plantit_pipeline.sh
 params:
-  - name: color-space
-    type: String
-    default: lab
-  - name: channels
-    type: String
-    default: 1
-  - name: num-clusters
-    type: number
-    default: 2
-  - name: min_size
-    type: number
-    default: 100
-  - name: max_size
-    type: number
-    default: 1000000
-  - name: min_dist
-    type: number
-    default: 50
-  - name: diagonal
-    type: number
-    default: 1.41421356237
-  - name: cue_color
-    type: number
-    default: 0
-  - name: cue_loc
-    type: number
-    default: 0
-  - name: out_boundary
-    type: number
-    default: 0
+  - name: Multiple
+    type: boolean
+    default: False
 input:
   kind: files
   filetypes:
