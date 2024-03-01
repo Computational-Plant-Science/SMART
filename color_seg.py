@@ -31,10 +31,10 @@ import argparse
 from sklearn.cluster import KMeans
 
 from skimage.feature import peak_local_max
-from skimage.morphology import watershed, medial_axis
+from skimage.morphology import medial_axis
 from skimage import img_as_float, img_as_ubyte, img_as_bool, img_as_int
 from skimage import measure
-from skimage.segmentation import clear_border
+from skimage.segmentation import clear_border, watershed
 
 from scipy.spatial import distance as dist
 from scipy import optimize
@@ -912,8 +912,8 @@ if __name__ == '__main__':
                                                                        + ' 1 is the second channel, etc. E.g., if BGR color space is used, "02" ' 
                                                                        + 'selects channels B and R. (default "all")')
     ap.add_argument('-n', '--num-clusters', type = int, default = 2,  help = 'Number of clusters for K-means clustering (default 2, min 2).')
-    ap.add_argument('-min', '--min_size', type = int, default = 100,  help = 'min size of object to be segmented.')
-    ap.add_argument('-max', '--max_size', type = int, default = 10000000,  help = 'max size of object to be segmented.')
+    ap.add_argument('-min', '--min_size', type = int, default = 10,  help = 'min size of object to be segmented.')
+    ap.add_argument('-max', '--max_size', type = int, default = 100000,  help = 'max size of object to be segmented.')
     ap.add_argument("-nr", "--nRows", required = False,  type = int,  default = 6, help="number of rows")
     ap.add_argument("-nc", "--mCols", required = False,  type = int,  default = 5, help="number of columns")
     args = vars(ap.parse_args())
