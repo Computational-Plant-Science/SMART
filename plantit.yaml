@@ -6,26 +6,28 @@ image: docker://computationalplantscience/smart
 
 commands: /opt/smart/plantit_pipeline.sh
 
-input:
-  kind: files
-  filetypes:
-    - jpg
-output:
-  include:
-    patterns:
-      - xlsx
 logo: media/Smart.png
 
 jobqueue:
-  walltime: "04:00:00"
+  walltime: "02:00:00"
   memory: "8GB"
   processes: 1
   cores: 12
 
+  
 params:
-  - name: filetype
-    type: String
-    default: jpg
-
+  - name: Multiple
+    type: boolean
+    default: False
     
-
+input:
+  kind: directory
+  path:
+  filetypes:
+    - jpg
+    - png
+output:
+  path:
+  include:
+    patterns:
+      - xlsx
