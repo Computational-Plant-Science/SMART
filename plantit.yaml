@@ -6,6 +6,7 @@ image: docker://computationalplantscience/smart
 
 commands: /opt/smart/plantit_pipeline.sh
 
+
 logo: media/Smart.png
 
 jobqueue:
@@ -49,8 +50,7 @@ params:
 
     
 input:
-  kind: directory
-  path:
+  kind: files
   filetypes:
     - jpg
 
