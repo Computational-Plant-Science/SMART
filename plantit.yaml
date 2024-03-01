@@ -1,30 +1,12 @@
 name: "SMART: Speedy Measurement of Arabidopsis Rosette Traits"
 author: Suxing Liu
 public: True
-doi: 10.1101/2021.12.17.472861
+clone: True
 image: docker://computationalplantscience/smart
-commands: python3 /opt/smart/core/trait_extract_parallel_demo.py -p $INPUT -n $NUM_CLUSTERS -min $MIN_SIZE -md $MIN_DIST
-params:
-  - name: num_clusters
-    type: number
-    default: 2
-    step: 1
-    min: 1
-    max: 20
-  - name: min_size
-    type: number
-    default: 200
-    step: 1
-    min: 1
-    max: 10000
-  - name: min_dist
-    type: number
-    default: 25
-    step: 1
-    min: 1
-    max: 1000
+commands: /opt/smart/plantit_pipeline.sh
 input:
-  kind: files
+  kind: directory
+  path:
   filetypes:
     - jpg
     - png
@@ -35,9 +17,9 @@ output:
       - png
       - csv
       - xlsx
-logo: media/Smart.png
+logo: media/rosette.jpg
 jobqueue:
   walltime: "04:00:00"
   memory: "5GB"
   processes: 1
-  cores: 2
+  cores: 12
