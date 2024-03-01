@@ -1,34 +1,29 @@
 name: "SMART: Speedy Measurement of Arabidopsis Rosette Traits"
 author: Suxing Liu
 public: True
-doi: 10.1101/2021.12.17.472861
+clone: True
 image: docker://computationalplantscience/smart
-
 commands: /opt/smart/plantit_pipeline.sh
-
-
-logo: media/Smart.png
-
-jobqueue:
-  walltime: "02:00:00"
-  memory: "8GB"
-  processes: 1
-  cores: 12
-  
-
 params:
-  - name: filetype
-    type: String
-    default: jpg
-
-    
+  - name: Multiple
+    type: boolean
+    default: False
 input:
-  kind: files
+  kind: directory
+  path:
   filetypes:
     - jpg
-
+    - png
 output:
   path:
   include:
     patterns:
+      - png
+      - csv
       - xlsx
+logo: media/rosette.jpg
+jobqueue:
+  walltime: "04:00:00"
+  memory: "5GB"
+  processes: 1
+  cores: 12

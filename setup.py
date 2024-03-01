@@ -7,7 +7,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name='smart-arabidopsis-traits',
-    version='0.5.4',
+    version='0.5.2',
     description='Extract geometric traits from top-view images of plants.',
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -26,9 +26,8 @@ setuptools.setup(
     install_requires=[
         'click',
         'psutil',
-        'numpy',
-        'numba==0.55.1',
-        'pandas==1.4.1',
+        'numba',
+        'pandas',
         'networkx',
         'skan',
         'tabulate',
@@ -39,13 +38,10 @@ setuptools.setup(
         'opencv-python',
         'matplotlib',
         'scikit-learn',
-        'scikit-image==0.19.3',
+        'scikit-image',
         'scikit-build',
         'scipy',
-        'Pillow==10.0.1',
-        'mayavi',
-        'progressbar',
-        'moviepy'
+        'Pillow'
     ],
     setup_requires=['wheel'],
     tests_require=['pytest', 'coveralls'])
