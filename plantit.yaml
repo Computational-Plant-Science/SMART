@@ -13,19 +13,47 @@ jobqueue:
   memory: "8GB"
   processes: 1
   cores: 12
-
   
+
 params:
-  - name: Multiple
-    type: boolean
-    default: False
+  - name: color-space
+    type: String
+    default: lab
+  - name: channels
+    type: String
+    default: 1
+  - name: num-clusters
+    type: number
+    default: 2
+  - name: min_size
+    type: number
+    default: 100
+  - name: max_size
+    type: number
+    default: 1000000
+  - name: min_dist
+    type: number
+    default: 50
+  - name: diagonal
+    type: number
+    default: 1.41421356237
+  - name: cue_color
+    type: number
+    default: 0
+  - name: cue_loc
+    type: number
+    default: 0
+  - name: out_boundary
+    type: number
+    default: 0
+
     
 input:
   kind: directory
   path:
   filetypes:
     - jpg
-    - png
+
 output:
   path:
   include:
