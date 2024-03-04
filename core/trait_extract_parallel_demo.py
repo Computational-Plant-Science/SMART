@@ -2123,14 +2123,15 @@ def extract_traits(image_file, result_path):
             
             #thresh = ~thresh
             # save segmentation result
-            result_file = (color_checker_path + base_name + '_color_checker_seg' + file_extension)
+            #result_file = (color_checker_path + base_name + '_color_checker_seg' + file_extension)
             #print(filename)
             #cv2.imwrite(result_file, color_checker_masked)
             
-            # save segmentation result
-            result_file = (color_checker_path + base_name + '_color_checker__excontour' + file_extension)
-            #print(filename)
-            cv2.imwrite(result_file, trait_img_checker)   
+        # save segmentation result
+        #result_file = (color_checker_path + base_name + '_color_checker__excontour' + file_extension)
+        result_file = (color_checker_path + base_name + '_color_checker__excontour.png')
+        #print(filename)
+        cv2.imwrite(result_file, trait_img_checker)   
 
         #compute the diagonal path length of each color checker
         avg_diagonal_length = np.average([max_width_checker, max_height_checker])
@@ -2142,13 +2143,7 @@ def extract_traits(image_file, result_path):
         
         ##########################################################################
         #Plant object detection
-        '''
-        x = int(img_width*0.10)
-        y = int(img_height*0.30) #0.32
-        w = int(img_width*0.35)  #0.35
-        h = int(img_height*0.44) # 0.46
-        
-        '''
+
         x = int(img_width*0.01)
         y = int(img_height*0) #0.32
         w = int(img_width*0.50)  #0.35
@@ -2197,11 +2192,13 @@ def extract_traits(image_file, result_path):
          #find external contour 
         (trait_img, area, solidity, max_width, max_height) = comp_external_contour(orig, thresh)
 
-        if args["debug"] == 1:
-            # save segmentation result
-            result_file = (save_path + base_name + '_excontour' + file_extension)
-            #print(filename)
-            cv2.imwrite(result_file, trait_img)
+        #if args["debug"] == 1:
+        
+        # save segmentation result
+        #result_file = (save_path + base_name + '_excontour' + file_extension)
+        result_file = (save_path + base_name + '_excontour.png')
+        #print(filename)
+        cv2.imwrite(result_file, trait_img)
         
         
         #print("hex_colors = {}\n".format(hex_colors))
@@ -2290,17 +2287,17 @@ def extract_traits(image_file, result_path):
         
         
         #####################################################################
-        if args["debug"] == 1:
-            #draw pie chart of color distributation
-            fig = plt.figure(figsize = (8, 6))
-            #plt.pie(counts.values(), labels = hex_colors, colors = hex_colors)
-            
-            
-            plt.pie(counts.values(), labels = ratio_color, colors = hex_colors)
+        #if args["debug"] == 1:
+        #draw pie chart of color distributation
+        fig = plt.figure(figsize = (8, 6))
+        #plt.pie(counts.values(), labels = hex_colors, colors = hex_colors)
+        
+        
+        plt.pie(counts.values(), labels = ratio_color, colors = hex_colors)
 
-            #define result path for labeled images
-            result_img_path = save_path + 'pie_color.png'
-            plt.savefig(result_img_path)
+        #define result path for labeled images
+        result_img_path = save_path + 'pie_color.png'
+        plt.savefig(result_img_path)
 
         #######################################################################
         
@@ -2596,6 +2593,7 @@ if __name__ == '__main__':
     '''
 
     trait_file = (result_path + 'trait.xlsx')
+    trait_file_csv = (result_path + 'trait.csv')
 
     
     if os.path.isfile(trait_file):
@@ -2653,6 +2651,13 @@ if __name__ == '__main__':
     wb.save(trait_file)
     
     
+    # save csv file
+    wb = openpyxl.load_workbook(trait_file)
+    sh = wb.active # was .get_active_sheet()
+    with open(trait_file_csv, 'w', newline = "") as f:
+        c = csv.writer(f)
+        for r in sh.rows: # generator; was sh.rows
+            c.writerow([cell.value for cell in r])
     
 
     
