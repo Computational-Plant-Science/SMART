@@ -2650,7 +2650,7 @@ if __name__ == '__main__':
     #save the csv file
     wb.save(trait_file)
     
-    
+    '''
     # save csv file
     wb = openpyxl.load_workbook(trait_file)
     sh = wb.active # was .get_active_sheet()
@@ -2658,7 +2658,7 @@ if __name__ == '__main__':
         c = csv.writer(f)
         for r in sh.rows: # generator; was sh.rows
             c.writerow([cell.value for cell in r])
-    
+    '''
 
     
 
