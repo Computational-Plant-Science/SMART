@@ -1485,9 +1485,10 @@ def color_region(image, mask, save_path, num_clusters):
     #apply the mask to get the segmentation of plant
     masked_image_ori = cv2.bitwise_and(image, image, mask = mask)
     
-    #define result path for labeled images
-    result_img_path = save_path + 'masked.png'
-    cv2.imwrite(result_img_path, masked_image_ori)
+    if args["debug"] == 1:
+        #define result path for labeled images
+        result_img_path = save_path + 'masked.png'
+        cv2.imwrite(result_img_path, masked_image_ori)
     
     # convert to RGB
     image_RGB = cv2.cvtColor(masked_image_ori, cv2.COLOR_BGR2RGB)
@@ -1519,9 +1520,11 @@ def color_region(image, mask, save_path, num_clusters):
 
 
     segmented_image_BRG = cv2.cvtColor(segmented_image, cv2.COLOR_RGB2BGR)
-    #define result path for labeled images
-    result_img_path = save_path + 'clustered.png'
-    cv2.imwrite(result_img_path, segmented_image_BRG)
+    
+    if args["debug"] == 1:
+        #define result path for labeled images
+        result_img_path = save_path + 'clustered.png'
+        cv2.imwrite(result_img_path, segmented_image_BRG)
 
 
     '''
@@ -2103,27 +2106,31 @@ def extract_traits(image_file, result_path):
 
         
         ################################################################################################
-        result_file = (color_checker_path + base_name + '_mask_checker' + file_extension)
-        #print(filename)
-        cv2.imwrite(result_file, mask_checker)
         
-        
-        result_file = (color_checker_path + base_name + '_color_checker_detected' + file_extension)
-        #print(filename)
-        cv2.imwrite(result_file, roi_image_checker)
-        
-        #thresh = ~thresh
-        # save segmentation result
-        result_file = (color_checker_path + base_name + '_color_checker_seg' + file_extension)
-        #print(filename)
-        #cv2.imwrite(result_file, color_checker_masked)
-
-         #find external contour 
+        #find external contour 
         (trait_img_checker, area_checker, solidity_checker, max_width_checker, max_height_checker) = comp_external_contour(color_checker_masked.copy(), mask_checker)
-        # save segmentation result
-        result_file = (color_checker_path + base_name + '_color_checker__excontour' + file_extension)
-        #print(filename)
-        cv2.imwrite(result_file, trait_img_checker)   
+        
+        if args["debug"] == 1: 
+            
+            result_file = (color_checker_path + base_name + '_mask_checker' + file_extension)
+            #print(filename)
+            cv2.imwrite(result_file, mask_checker)
+            
+            
+            result_file = (color_checker_path + base_name + '_color_checker_detected' + file_extension)
+            #print(filename)
+            cv2.imwrite(result_file, roi_image_checker)
+            
+            #thresh = ~thresh
+            # save segmentation result
+            result_file = (color_checker_path + base_name + '_color_checker_seg' + file_extension)
+            #print(filename)
+            #cv2.imwrite(result_file, color_checker_masked)
+            
+            # save segmentation result
+            result_file = (color_checker_path + base_name + '_color_checker__excontour' + file_extension)
+            #print(filename)
+            cv2.imwrite(result_file, trait_img_checker)   
 
         #compute the diagonal path length of each color checker
         avg_diagonal_length = np.average([max_width_checker, max_height_checker])
@@ -2149,9 +2156,10 @@ def extract_traits(image_file, result_path):
         
         roi_image = region_extracted(orig, x, y, w, h)
         
-        # save result
-        result_file = (save_path + base_name + '_plant_region' + file_extension)
-        cv2.imwrite(result_file, roi_image)
+        if args["debug"] == 1: 
+            # save result
+            result_file = (save_path + base_name + '_plant_region' + file_extension)
+            cv2.imwrite(result_file, roi_image)
         
         ###################################################################################
         # PhotoRoom Remove Background API
@@ -2167,10 +2175,12 @@ def extract_traits(image_file, result_path):
         thresh = color_cluster_seg(orig, args_colorspace, args_channels, args_num_clusters)
         
         #thresh = ~thresh
-        # save segmentation result
-        result_file = (save_path + base_name + '_seg' + file_extension)
-        #print(filename)
-        cv2.imwrite(result_file, thresh)
+        
+        if args["debug"] == 1:
+            # save segmentation result
+            result_file = (save_path + base_name + '_seg' + file_extension)
+            #print(filename)
+            cv2.imwrite(result_file, thresh)
 
         
         # save plant image as lab color chart
@@ -2186,10 +2196,12 @@ def extract_traits(image_file, result_path):
 
          #find external contour 
         (trait_img, area, solidity, max_width, max_height) = comp_external_contour(orig, thresh)
-        # save segmentation result
-        result_file = (save_path + base_name + '_excontour' + file_extension)
-        #print(filename)
-        cv2.imwrite(result_file, trait_img)   
+
+        if args["debug"] == 1:
+            # save segmentation result
+            result_file = (save_path + base_name + '_excontour' + file_extension)
+            #print(filename)
+            cv2.imwrite(result_file, trait_img)
         
         
         #print("hex_colors = {}\n".format(hex_colors))
@@ -2278,16 +2290,17 @@ def extract_traits(image_file, result_path):
         
         
         #####################################################################
-        #draw pie chart of color distributation
-        fig = plt.figure(figsize = (8, 6))
-        #plt.pie(counts.values(), labels = hex_colors, colors = hex_colors)
-        
-        
-        plt.pie(counts.values(), labels = ratio_color, colors = hex_colors)
+        if args["debug"] == 1:
+            #draw pie chart of color distributation
+            fig = plt.figure(figsize = (8, 6))
+            #plt.pie(counts.values(), labels = hex_colors, colors = hex_colors)
+            
+            
+            plt.pie(counts.values(), labels = ratio_color, colors = hex_colors)
 
-        #define result path for labeled images
-        result_img_path = save_path + 'pie_color.png'
-        plt.savefig(result_img_path)
+            #define result path for labeled images
+            result_img_path = save_path + 'pie_color.png'
+            plt.savefig(result_img_path)
 
         #######################################################################
         
@@ -2298,16 +2311,7 @@ def extract_traits(image_file, result_path):
         # compute the distance between the current L*a*b* color value in color checker and the mean of the plant surface image in CIE lab space
         
         #print("Detected color checker value in lab: skin = {} foliage = {} purple = {}\n".format(checker_color_value[13], checker_color_value[15], checker_color_value[8]))
-        '''
-        if len(checker_color_value) < 18:
-            
-            print('Color checker checker deteced = {}\n'.format(len(checker_color_value)))
-            
-            ref_color_list = [(194, 150, 130), (87, 108, 67), (94, 60, 108)]
-        else:
-            ref_color_list = [checker_color_value[13], checker_color_value[15], checker_color_value[8]]
-        
-        '''
+
         
         if len(green_checker_idx) > 0:
         
@@ -2345,12 +2349,12 @@ def extract_traits(image_file, result_path):
         
         #accquire medial axis of segmentation mask
         #image_skeleton = medial_axis_image(thresh)
-        
-        image_skeleton, skeleton = skeleton_bw(thresh)
+        if args["debug"] == 1:
+            image_skeleton, skeleton = skeleton_bw(thresh)
 
-        # save _skeleton result
-        result_file = (save_path + base_name + '_skeleton' + file_extension)
-        cv2.imwrite(result_file, img_as_ubyte(image_skeleton))
+            # save _skeleton result
+            result_file = (save_path + base_name + '_skeleton' + file_extension)
+            cv2.imwrite(result_file, img_as_ubyte(image_skeleton))
 
         
         ############################################## leaf number computation
@@ -2379,12 +2383,13 @@ def extract_traits(image_file, result_path):
 
         # cvt to BGR for display
         labeled_img = cv2.cvtColor(labeled_img, cv2.COLOR_HSV2BGR)
-
-        # set background label to black
-        labeled_img[label_hue==0] = 0
-        result_file = (save_path + base_name + '_label' + file_extension)
-        #plt.imsave(result_file, img_as_float(labels), cmap = "Spectral")
-        cv2.imwrite(result_file, labeled_img)
+        
+        if args["debug"] == 1:
+            # set background label to black
+            labeled_img[label_hue==0] = 0
+            result_file = (save_path + base_name + '_label' + file_extension)
+            #plt.imsave(result_file, img_as_float(labels), cmap = "Spectral")
+            cv2.imwrite(result_file, labeled_img)
         
         
         #(avg_curv, label_trait, track_trait, leaf_index_rec, contours_rec, area_rec, curv_rec, solidity_rec, major_axis_rec, minor_axis_rec, leaf_color_ratio_rec, leaf_color_value_rec, box_coord_rec) = leaf_traits_computation(roi_image.copy(), labels, save_path, base_name, file_extension)
@@ -2451,6 +2456,7 @@ if __name__ == '__main__':
     ap.add_argument('-max', '--max_size', dest = "max_size", type = int, required = False, default = 1000000,  help = 'max size of object to be segmented.')
     ap.add_argument('-md', '--min_dist', dest = "min_dist", type = int, required = False, default = 25,  help = 'distance threshold of watershed segmentation.')
     ap.add_argument("-da", "--diagonal", dest = "diagonal", type = float, required = False,  default = math.sqrt(2), help = "diagonal line length(cm) of indiviudal color checker module")
+    ap.add_argument("-d", "--debug", dest = "debug", type = int, required = False,  default = 0, help = "Whehter save image results or not, 1 = yes, 0 = no")
     #ap.add_argument("-cc", "--cue_color", dest = "cue_color", type = int, required = False,  default = 0, help="use color cue to detect plant object")
     #ap.add_argument("-cl", "--cue_loc", dest = "cue_loc", type = int, required = False,  default = 0, help="use location cue to detect plant object")
     #ap.add_argument("-ob", "--out_boundary", dest = "out_boundary", type = int, required = False,  default = 0, help="whether the plant object was out of the image boudary or not, 1 yes, 0 no, default 0")
