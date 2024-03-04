@@ -17,7 +17,6 @@ output:
   path:
   include:
     patterns:
-      - png
       - xlsx
 
 jobqueue:

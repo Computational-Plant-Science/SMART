@@ -2127,11 +2127,11 @@ def extract_traits(image_file, result_path):
             #print(filename)
             #cv2.imwrite(result_file, color_checker_masked)
             
-        # save segmentation result
-        #result_file = (color_checker_path + base_name + '_color_checker__excontour' + file_extension)
-        result_file = (color_checker_path + base_name + '_color_checker__excontour.png')
-        #print(filename)
-        cv2.imwrite(result_file, trait_img_checker)   
+            # save segmentation result
+            #result_file = (color_checker_path + base_name + '_color_checker__excontour' + file_extension)
+            result_file = (color_checker_path + base_name + '_color_checker__excontour.png')
+            #print(filename)
+            cv2.imwrite(result_file, trait_img_checker)   
 
         #compute the diagonal path length of each color checker
         avg_diagonal_length = np.average([max_width_checker, max_height_checker])
@@ -2192,14 +2192,15 @@ def extract_traits(image_file, result_path):
          #find external contour 
         (trait_img, area, solidity, max_width, max_height) = comp_external_contour(orig, thresh)
 
-        #if args["debug"] == 1:
+        '''
+        if args["debug"] == 1:
         
-        # save segmentation result
-        #result_file = (save_path + base_name + '_excontour' + file_extension)
-        result_file = (save_path + base_name + '_excontour.png')
-        #print(filename)
-        cv2.imwrite(result_file, trait_img)
-        
+            # save segmentation result
+            #result_file = (save_path + base_name + '_excontour' + file_extension)
+            result_file = (save_path + base_name + '_excontour.png')
+            #print(filename)
+            cv2.imwrite(result_file, trait_img)
+        '''
         
         #print("hex_colors = {}\n".format(hex_colors))
         
@@ -2285,20 +2286,27 @@ def extract_traits(image_file, result_path):
         
         
         
-        
+        '''
         #####################################################################
-        #if args["debug"] == 1:
-        #draw pie chart of color distributation
-        fig = plt.figure(figsize = (8, 6))
-        #plt.pie(counts.values(), labels = hex_colors, colors = hex_colors)
-        
-        
-        plt.pie(counts.values(), labels = ratio_color, colors = hex_colors)
+        if args["debug"] == 1:
+            
+            # save segmentation result
+            #result_file = (save_path + base_name + '_excontour' + file_extension)
+            result_file = (save_path + base_name + '_excontour.png')
+            #print(filename)
+            cv2.imwrite(result_file, trait_img)
+            
+            #draw pie chart of color distributation
+            fig = plt.figure(figsize = (8, 6))
+            #plt.pie(counts.values(), labels = hex_colors, colors = hex_colors)
+            
+            
+            plt.pie(counts.values(), labels = ratio_color, colors = hex_colors)
 
-        #define result path for labeled images
-        result_img_path = save_path + 'pie_color.png'
-        plt.savefig(result_img_path)
-
+            #define result path for labeled images
+            result_img_path = save_path + 'pie_color.png'
+            plt.savefig(result_img_path)
+        '''
         #######################################################################
         
         # get reference color from selected color checker
@@ -2346,13 +2354,15 @@ def extract_traits(image_file, result_path):
         
         #accquire medial axis of segmentation mask
         #image_skeleton = medial_axis_image(thresh)
+        
+            
+        image_skeleton, skeleton = skeleton_bw(thresh)
+        '''
         if args["debug"] == 1:
-            image_skeleton, skeleton = skeleton_bw(thresh)
-
             # save _skeleton result
             result_file = (save_path + base_name + '_skeleton' + file_extension)
             cv2.imwrite(result_file, img_as_ubyte(image_skeleton))
-
+        '''
         
         ############################################## leaf number computation
 
@@ -2382,6 +2392,29 @@ def extract_traits(image_file, result_path):
         labeled_img = cv2.cvtColor(labeled_img, cv2.COLOR_HSV2BGR)
         
         if args["debug"] == 1:
+            
+            # save segmentation result
+            #result_file = (save_path + base_name + '_excontour' + file_extension)
+            result_file = (save_path + base_name + '_excontour.png')
+            #print(filename)
+            cv2.imwrite(result_file, trait_img)
+            
+            #draw pie chart of color distributation
+            fig = plt.figure(figsize = (8, 6))
+            #plt.pie(counts.values(), labels = hex_colors, colors = hex_colors)
+            
+            
+            plt.pie(counts.values(), labels = ratio_color, colors = hex_colors)
+
+            #define result path for labeled images
+            result_img_path = save_path + 'pie_color.png'
+            plt.savefig(result_img_path)
+            
+            # save _skeleton result
+            result_file = (save_path + base_name + '_skeleton' + file_extension)
+            cv2.imwrite(result_file, img_as_ubyte(image_skeleton))
+            
+            
             # set background label to black
             labeled_img[label_hue==0] = 0
             result_file = (save_path + base_name + '_label' + file_extension)
