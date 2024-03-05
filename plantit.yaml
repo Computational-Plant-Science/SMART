@@ -17,8 +17,8 @@ output:
   path:
   include:
     patterns:
-      - xlsx
       - png
+      - xlsx
        
 jobqueue:
   walltime: "04:00:00"
