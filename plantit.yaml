@@ -4,24 +4,21 @@ public: True
 clone: True
 image: docker://computationalplantscience/smart
 commands: /opt/smart/plantit_pipeline.sh
-logo: media/rosette.jpg
-
 input:
   kind: directory
   path:
   filetypes:
     - jpg
     - png
-
 output:
   path:
   include:
     patterns:
       - png
       - xlsx
-       
+logo: media/rosette.jpg
 jobqueue:
   walltime: "04:00:00"
-  memory: "8GB"
+  memory: "5GB"
   processes: 1
   cores: 12
