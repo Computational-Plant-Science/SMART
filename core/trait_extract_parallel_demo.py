@@ -2515,7 +2515,7 @@ if __name__ == '__main__':
     
     result_path = args["output_path"] if args["output_path"] is not None else os.getcwd()
     
-    result_path += '/'
+    #result_path += '/'
     
     ext = args['filetype'].split(',') if 'filetype' in args else []
     
