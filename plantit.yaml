@@ -18,7 +18,8 @@ output:
   include:
     patterns:
       - xlsx
-
+       - png
+       
 jobqueue:
   walltime: "04:00:00"
   memory: "8GB"

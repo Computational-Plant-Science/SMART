@@ -1485,10 +1485,6 @@ def color_region(image, mask, save_path, num_clusters):
     #apply the mask to get the segmentation of plant
     masked_image_ori = cv2.bitwise_and(image, image, mask = mask)
     
-    if args["debug"] == 1:
-        #define result path for labeled images
-        result_img_path = save_path + 'masked.png'
-        cv2.imwrite(result_img_path, masked_image_ori)
     
     # convert to RGB
     image_RGB = cv2.cvtColor(masked_image_ori, cv2.COLOR_BGR2RGB)
@@ -1522,10 +1518,18 @@ def color_region(image, mask, save_path, num_clusters):
     segmented_image_BRG = cv2.cvtColor(segmented_image, cv2.COLOR_RGB2BGR)
     
     if args["debug"] == 1:
+
+        #define result path for labeled images
+        result_img_path = save_path + 'masked.png'
+        cv2.imwrite(result_img_path, masked_image_ori)
+        
         #define result path for labeled images
         result_img_path = save_path + 'clustered.png'
         cv2.imwrite(result_img_path, segmented_image_BRG)
 
+    #define result path for labeled images
+    result_img_path = save_path + 'clustered.png'
+    cv2.imwrite(result_img_path, segmented_image_BRG)
 
     '''
     fig = plt.figure()
@@ -1662,7 +1666,6 @@ def color_region(image, mask, save_path, num_clusters):
         color_ratio.append(percentage(value_counts, np.sum(list_counts)))
 
     
-
    
     return rgb_colors, counts, hex_colors, color_ratio
 
@@ -2151,10 +2154,6 @@ def extract_traits(image_file, result_path):
         
         roi_image = region_extracted(orig, x, y, w, h)
         
-        if args["debug"] == 1: 
-            # save result
-            result_file = (save_path + base_name + '_plant_region' + file_extension)
-            cv2.imwrite(result_file, roi_image)
         
         ###################################################################################
         # PhotoRoom Remove Background API
@@ -2171,13 +2170,6 @@ def extract_traits(image_file, result_path):
         
         #thresh = ~thresh
         
-        if args["debug"] == 1:
-            # save segmentation result
-            result_file = (save_path + base_name + '_seg' + file_extension)
-            #print(filename)
-            cv2.imwrite(result_file, thresh)
-
-        
         # save plant image as lab color chart
         
         
@@ -2192,15 +2184,7 @@ def extract_traits(image_file, result_path):
          #find external contour 
         (trait_img, area, solidity, max_width, max_height) = comp_external_contour(orig, thresh)
 
-        '''
-        if args["debug"] == 1:
-        
-            # save segmentation result
-            #result_file = (save_path + base_name + '_excontour' + file_extension)
-            result_file = (save_path + base_name + '_excontour.png')
-            #print(filename)
-            cv2.imwrite(result_file, trait_img)
-        '''
+
         
         #print("hex_colors = {}\n".format(hex_colors))
         
@@ -2394,6 +2378,15 @@ def extract_traits(image_file, result_path):
         if args["debug"] == 1:
             
             # save segmentation result
+            result_file = (save_path + base_name + '_seg' + file_extension)
+            #print(filename)
+            cv2.imwrite(result_file, thresh)
+            
+            # save result
+            result_file = (save_path + base_name + '_plant_region' + file_extension)
+            cv2.imwrite(result_file, roi_image)
+            
+            # save segmentation result
             #result_file = (save_path + base_name + '_excontour' + file_extension)
             result_file = (save_path + base_name + '_excontour.png')
             #print(filename)
@@ -2402,8 +2395,6 @@ def extract_traits(image_file, result_path):
             #draw pie chart of color distributation
             fig = plt.figure(figsize = (8, 6))
             #plt.pie(counts.values(), labels = hex_colors, colors = hex_colors)
-            
-            
             plt.pie(counts.values(), labels = ratio_color, colors = hex_colors)
 
             #define result path for labeled images
@@ -2417,10 +2408,29 @@ def extract_traits(image_file, result_path):
             
             # set background label to black
             labeled_img[label_hue==0] = 0
-            result_file = (save_path + base_name + '_label' + file_extension)
+            #result_file = (save_path + base_name + '_label' + file_extension)
+            result_file = (save_path + base_name + '_label.png')
             #plt.imsave(result_file, img_as_float(labels), cmap = "Spectral")
             cv2.imwrite(result_file, labeled_img)
         
+        #############################################################################################3
+        
+        #draw pie chart of color distributation
+        fig = plt.figure(figsize = (8, 6))
+        #plt.pie(counts.values(), labels = hex_colors, colors = hex_colors)
+        plt.pie(counts.values(), labels = ratio_color, colors = hex_colors)
+
+        #define result path for labeled images
+        result_img_path = save_path + 'pie_color.png'
+        plt.savefig(result_img_path)
+            
+
+        
+        # set background label to black
+        labeled_img[label_hue==0] = 0
+        result_file = (save_path + base_name + '_label.png')
+        #plt.imsave(result_file, img_as_float(labels), cmap = "Spectral")
+        cv2.imwrite(result_file, labeled_img)
         
         #(avg_curv, label_trait, track_trait, leaf_index_rec, contours_rec, area_rec, curv_rec, solidity_rec, major_axis_rec, minor_axis_rec, leaf_color_ratio_rec, leaf_color_value_rec, box_coord_rec) = leaf_traits_computation(roi_image.copy(), labels, save_path, base_name, file_extension)
         
