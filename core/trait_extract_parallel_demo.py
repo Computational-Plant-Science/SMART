@@ -1528,8 +1528,8 @@ def color_region(image, mask, save_path, num_clusters):
         cv2.imwrite(result_img_path, segmented_image_BRG)
 
     #define result path for labeled images
-    result_img_path = save_path + 'clustered.png'
-    cv2.imwrite(result_img_path, segmented_image_BRG)
+    #result_img_path = save_path + 'clustered.png'
+    #cv2.imwrite(result_img_path, segmented_image_BRG)
 
     '''
     fig = plt.figure()
@@ -2414,7 +2414,7 @@ def extract_traits(image_file, result_path):
             cv2.imwrite(result_file, labeled_img)
         
         #############################################################################################3
-        
+        '''
         #draw pie chart of color distributation
         fig = plt.figure(figsize = (8, 6))
         #plt.pie(counts.values(), labels = hex_colors, colors = hex_colors)
@@ -2433,7 +2433,7 @@ def extract_traits(image_file, result_path):
         cv2.imwrite(result_file, labeled_img)
         
         #(avg_curv, label_trait, track_trait, leaf_index_rec, contours_rec, area_rec, curv_rec, solidity_rec, major_axis_rec, minor_axis_rec, leaf_color_ratio_rec, leaf_color_value_rec, box_coord_rec) = leaf_traits_computation(roi_image.copy(), labels, save_path, base_name, file_extension)
-        
+        '''
 
         #################################################################end of validation file
         n_leaves = int(len(np.unique(labels)))
@@ -2525,7 +2525,7 @@ if __name__ == '__main__':
     
     result_path = args["output_path"] if args["output_path"] is not None else os.getcwd()
     
-    #result_path += '/'
+    result_path += '/'
     
     ext = args['filetype'].split(',') if 'filetype' in args else []
     

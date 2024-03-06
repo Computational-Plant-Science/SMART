@@ -14,7 +14,6 @@ output:
   path:
   include:
     patterns:
-      - png
       - xlsx
 logo: media/rosette.jpg
 jobqueue:
