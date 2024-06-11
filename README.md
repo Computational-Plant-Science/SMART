@@ -11,7 +11,7 @@ Author: Suxing Liu
 
 
 
-![Optional Text](../master/media/Smart.png) 
+![Optional Text](../main/media/Smart.png) 
 
 Robust and parameter-free plant image segmentation and trait extraction.
 
@@ -22,13 +22,13 @@ Robust and parameter-free plant image segmentation and trait extraction.
 
 ## Sample workflow
 
-![Pipeline](../master/media/Slide1.png)
+![Pipeline](../main/media/Slide1.png)
 
-![Leaf surface color analysis](../master/media/Slide2.png)
+![Leaf surface color analysis](../main/media/Slide2.png)
 
-![Plant color analysis using Color Checker](../master/media/Slide3.png)
+![Plant color analysis using Color Checker](../main/media/Slide3.png)
 
-![Monitor plant growth](../master/media/monitor_time_growth.gif)
+![Monitor plant growth](../main/media/monitor_time_growth.gif)
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
@@ -51,7 +51,7 @@ Excel or csv file which contains trait computation values.
 
 ## Traits summary
 
-![Pipeline](../master/media/traits_summary.png)
+![Pipeline](../main/media/traits_summary.png)
 
 
 ## Usage in the local environment by cloning the whole GitHub repo 
@@ -193,7 +193,7 @@ The SMART pipeline has also been applied in collaboration with following researc
 ## Imaging protocol for SMART
 
 
-![Optional Text](../master/media/plant.jpg)
+![Optional Text](../main/media/plant.jpg)
 
 Setting up plants
 
@@ -205,7 +205,7 @@ Setting up plants
 
 
 
-![Optional Text](../master/media/camera.jpg)
+![Optional Text](../main/media/camera.jpg)
 
 Setting up camera
 
