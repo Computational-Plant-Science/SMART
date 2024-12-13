@@ -34,7 +34,7 @@ RUN DEBIAN_FRONTEND="noninteractive" TZ="America/New_York" apt-get install -y \
 
 RUN python3 -m pip install --upgrade pip
 
-RUN pip3 install numpy \
+RUN pip3 install numpy<=1.26.4 \
     Pillow \
     scipy \
     scikit-image==0.19.3 \
@@ -53,7 +53,8 @@ RUN pip3 install numpy \
     natsort \
     pathlib \
     kmeans1d \
-    rembg
+    rembg \
+    onnxruntime
 
 
 
